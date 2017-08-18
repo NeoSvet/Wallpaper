@@ -17,6 +17,7 @@
     <string name="slideshow">Слайд-шоу</string>
     <string name="slideshow_stop">Слайд-шоу завершено</string>
     <string name="slideshow_timer">Таймер слайд-шоу (в секундах)</string>
+    <string name="start_open">Открывать при запуске:</string>
     <string name="list_finish">Список закончился</string>
     <string name="add_fav">Добавить в избранное</string>
     <string name="del_fav">Удалить из избранного</string>

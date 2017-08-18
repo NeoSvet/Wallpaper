@@ -8,8 +8,8 @@ import android.content.SharedPreferences;
  */
 
 public class Settings {
-    private final String VIEW = "view", SITE = "site", SLIDESHOW = "slideshow";
-    public static final int ZOOMING_VIEW = 0, SIMPLE_VIEW = 1;
+    private final String VIEW = "view", SITE = "site", SLIDESHOW = "slideshow", STARTOPEN = "startopen";
+    public static final int ZOOMING_VIEW = 0, SIMPLE_VIEW = 1, START_MAIN = 0, START_FAVORITE = 1;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
 
@@ -45,4 +45,13 @@ public class Settings {
     public void setSlideshowTime(int time) {
         editor.putInt(SLIDESHOW, time);
     }
+
+    public int getStartOpen() {
+        return pref.getInt(STARTOPEN, 0);
+    }
+
+    public void setStartOpen(int index) {
+        editor.putInt(STARTOPEN, index);
+    }
+
 }

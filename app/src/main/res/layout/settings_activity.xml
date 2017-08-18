@@ -17,6 +17,19 @@
         android:textColor="@android:color/white"
         android:textSize="22sp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/start_open"
+        android:textSize="18sp" />
+
+    <Spinner
+        android:id="@+id/spStartOpen"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/field" />
+
     <Spinner
         android:id="@+id/spViewObject"
         android:layout_width="200dp"

@@ -50,12 +50,15 @@ public class MainActivity extends LoaderMaster
     private ListAdapter adCategory;
     private GalleryAdapter adGallery;
     private PagesAdapter adPages;
+    private Settings settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         verifyStoragePermissions();
+
+        initSettings();
         initUI();
 
         File d = Lib.getFile("");
@@ -63,6 +66,11 @@ public class MainActivity extends LoaderMaster
 
         intSrv = new Intent(MainActivity.this, GalleryLoader.class);
         restoreActivityState(savedInstanceState);
+    }
+
+    private void initSettings() {
+        settings = new Settings(MainActivity.this);
+        site = settings.getSite();
     }
 
     private boolean verifyStoragePermissions() {
@@ -115,8 +123,11 @@ public class MainActivity extends LoaderMaster
     protected void restoreActivityState(Bundle state) {
         super.restoreActivityState(state);
         if (state == null) {
-            MainActivity.this.setTitle(getResources().getString(R.string.main));
-            loadPage(1);
+            if (settings.getStartOpen() == Settings.START_MAIN) {
+                MainActivity.this.setTitle(getResources().getString(R.string.main));
+                loadPage(1);
+            } else //Settings.START_FAVORITE
+                changeRep(DBHelper.FAVORITE);
         } else {
             catigory = state.getString(Lib.CATEGORIES);
             page = state.getInt(Lib.PAGE);
@@ -215,10 +226,6 @@ public class MainActivity extends LoaderMaster
 
     private void cmdImport() {
         try {
-            if (site == null) {
-                Settings settings = new Settings(MainActivity.this);
-                site = settings.getSite();
-            }
             File f = new File(Lib.getFolder() + "/fav");
             if (!f.exists()) return;
             BufferedReader br = new BufferedReader(new FileReader(f));
@@ -372,6 +379,7 @@ public class MainActivity extends LoaderMaster
 
     private void loadPage(int new_page) {
         page = new_page;
+        intSrv.putExtra(DBHelper.LIST, DBHelper.LIST);
         intSrv.putExtra(Lib.PAGE, page);
         intSrv.putExtra(Lib.TAG, (tag == null ? "" : tag.replace(" ", "+")));
         startLoader();

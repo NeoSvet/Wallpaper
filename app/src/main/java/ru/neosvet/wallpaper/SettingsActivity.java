@@ -12,7 +12,7 @@ import ru.neosvet.wallpaper.utils.Settings;
 
 public class SettingsActivity extends AppCompatActivity {
     private EditText edSite;
-    private Spinner spViewObject;
+    private Spinner spViewObject, spStartOpen;
     private SeekBar sbSlideShow;
     private TextView tvSlideShow;
     private Settings settings;
@@ -20,12 +20,13 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        setContentView(R.layout.settings_activity);
 
         settings = new Settings(SettingsActivity.this);
         initSite();
         initViewObject();
         initSlideshowTimer();
+        initStartOpen();
     }
 
     @Override
@@ -34,6 +35,7 @@ public class SettingsActivity extends AppCompatActivity {
         settings.setSite(edSite.getText().toString());
         settings.setView(spViewObject.getSelectedItemPosition());
         settings.setSlideshowTime(sbSlideShow.getProgress() + 1);
+        settings.setStartOpen(spStartOpen.getSelectedItemPosition());
         settings.save();
     }
 
@@ -71,5 +73,15 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
         sbSlideShow.setProgress(settings.getSlideshowTime() - 1);
+    }
+
+    private void initStartOpen() {
+        spStartOpen = (Spinner) findViewById(R.id.spStartOpen);
+        spStartOpen.setPopupBackgroundResource(R.drawable.cell_none);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this, R.layout.list_item, new String[]{
+                getResources().getString(R.string.main), getResources().getString(R.string.favorite)});
+        spStartOpen.setAdapter(adapter);
+        spStartOpen.setSelection(settings.getStartOpen());
     }
 }
