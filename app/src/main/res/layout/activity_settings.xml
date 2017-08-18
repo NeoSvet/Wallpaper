@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    tools:context="ru.neosvet.wallpaper.SettingsActivity">
+
+    <EditText
+        android:id="@+id/etSite"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/field"
+        android:padding="10dp"
+        android:textColor="@android:color/white"
+        android:textSize="22sp" />
+
+    <Spinner
+        android:id="@+id/spViewObject"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/field" />
+</LinearLayout>

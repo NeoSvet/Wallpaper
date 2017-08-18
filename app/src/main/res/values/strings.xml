@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">НеоОбои</string>
+    <string name="main">Главная</string>
+    <string name="sections">Разделы</string>
+    <string name="favorite">Избранное</string>
+    <string name="recent">Недавние</string>
+    <string name="settings">Настройки</string>
+    <string name="actions">Операции</string>
+    <string name="refresh">Обновить</string>
+    <string name="reverse">Обратный порядок</string>
+    <string name="mix">Перемешать</string>
+    <string name="inport">Импорт</string>
+    <string name="export">Экспорт</string>
+    <string name="ready">Готово</string>
+    <string name="tags">Теги</string>
+    <string name="tag">Тег:</string>
+    <string name="slideshow">Слайд-шоу</string>
+    <string name="slideshow_stop">Слайд-шоу завершено</string>
+    <string name="list_finish">Список закончился</string>
+    <string name="add_fav">Добавить в избранное</string>
+    <string name="del_fav">Удалить из избранного</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+</resources>

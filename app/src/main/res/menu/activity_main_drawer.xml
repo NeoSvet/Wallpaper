@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_main"
+            android:icon="@drawable/ic_main"
+            android:title="@string/main" />
+        <item
+            android:id="@+id/nav_sections"
+            android:icon="@drawable/ic_sections"
+            android:title="@string/sections" />
+        <item
+            android:id="@+id/nav_favorite"
+            android:icon="@drawable/ic_favorite"
+            android:title="@string/favorite" />
+        <item
+            android:id="@+id/nav_recent"
+            android:icon="@drawable/ic_recent"
+            android:title="@string/recent" />
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/settings" />
+    </group>
+
+    <item android:title="@string/actions">
+        <menu>
+            <item
+                android:id="@+id/nav_refresh"
+                android:icon="@drawable/ic_refresh"
+                android:title="@string/refresh" />
+            <item
+                android:id="@+id/nav_reverse"
+                android:icon="@drawable/ic_reverse"
+                android:title="@string/reverse" />
+            <item
+                android:id="@+id/nav_mix"
+                android:icon="@drawable/ic_mix"
+                android:title="@string/mix" />
+            <item
+                android:id="@+id/nav_import"
+                android:icon="@drawable/ic_import"
+                android:title="@string/inport" />
+            <item
+                android:id="@+id/nav_export"
+                android:icon="@drawable/ic_export"
+                android:title="@string/export" />
+        </menu>
+    </item>
+
+</menu>
