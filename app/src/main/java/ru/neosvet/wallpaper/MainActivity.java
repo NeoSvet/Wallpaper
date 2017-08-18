@@ -126,8 +126,10 @@ public class MainActivity extends LoaderMaster
             if (settings.getStartOpen() == Settings.START_MAIN) {
                 MainActivity.this.setTitle(getResources().getString(R.string.main));
                 loadPage(1);
-            } else //Settings.START_FAVORITE
+            } else {//Settings.START_FAVORITE
+                tag = DBHelper.FAVORITE;
                 changeRep(DBHelper.FAVORITE);
+            }
         } else {
             catigory = state.getString(Lib.CATEGORIES);
             page = state.getInt(Lib.PAGE);
