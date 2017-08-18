@@ -35,7 +35,8 @@
         android:id="@+id/rvPages"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true" />
 
     <ListView
         android:id="@+id/lvSections"
