@@ -64,6 +64,8 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
     private Timer tSlideShow;
     private List<HistoryItem> history = new LinkedList<HistoryItem>();
     private boolean boolSlideShow;
+    private Settings settings;
+    private int slideshow_time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +74,8 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.image_activity);
+
+        settings = new Settings(ImageActivity.this);
         initUI();
         initGesturesImage();
         dpi = getResources().getDisplayMetrics().density;
@@ -215,7 +219,6 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
         tvToast = (TextView) findViewById(R.id.tvToast);
         tip = new Tip(ImageActivity.this, tvToast);
         imageView = (CustomImageView) findViewById(R.id.imageView);
-        Settings settings = new Settings(ImageActivity.this);
         imageView.selectSimpleView(settings.getView() == Settings.SIMPLE_VIEW);
         rvMenu = (RecyclerView) findViewById(R.id.rvMenu);
         rvCarousel = (RecyclerView) findViewById(R.id.rvCarousel);
@@ -369,7 +372,8 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
         } catch (Exception e) {
             e.printStackTrace();
         }
-        progressBar.setVisibility(View.GONE);
+        if (!boolSlideShow)
+            progressBar.setVisibility(View.GONE);
         load = false;
     }
 
@@ -403,7 +407,8 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
         if (suc) {
             if (file.exists()) {
                 openImage(file.toString());
-                progressBar.setVisibility(View.GONE);
+                if (!boolSlideShow)
+                    progressBar.setVisibility(View.GONE);
             } else {
                 Picasso.with(ImageActivity.this)
                         .load(link).memoryPolicy(MemoryPolicy.NO_CACHE)
@@ -450,24 +455,7 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
             }).start();
         } else if (menu) {
             if (item.equals(getResources().getString(R.string.slideshow))) {
-                toolbar.setVisibility(View.GONE);
-                rvCarousel.setVisibility(View.GONE);
-                TimerTask tTask = new TimerTask() {
-                    @Override
-                    public void run() {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (!changeImage(true)) {
-                                    stopSlideShow();
-                                }
-                            }
-                        });
-                    }
-                };
-                tSlideShow = new Timer();
-                tSlideShow.schedule(tTask, 4000, 4000);
-                boolSlideShow = true;
+                startSlideshow();
             } else if (item.equals(getResources().getString(R.string.tags))) {
                 menu = false;
                 adMenu = new UniAdapter(ImageActivity.this, tags);
@@ -489,10 +477,50 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
         }
     }
 
+    private void startSlideshow() {
+        toolbar.setVisibility(View.GONE);
+        rvCarousel.setVisibility(View.GONE);
+        slideshow_time = settings.getSlideshowTime();
+        TimerTask tTask = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    while (ImageActivity.this.mode_srv != NO_SERVICE)
+                        Thread.sleep(500);
+                } catch (Exception e) {
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        slideshow_time--;
+                        if (slideshow_time == 0) {
+                            if (!changeImage(true))
+                                stopSlideShow();
+                            else {
+                                progressBar.setProgress(0);
+                                slideshow_time = settings.getSlideshowTime();
+                            }
+                        } else
+                            progressBar.incrementProgressBy(1);
+                    }
+                });
+            }
+        };
+        tSlideShow = new Timer();
+        tSlideShow.schedule(tTask, 1000, 1000);
+        boolSlideShow = true;
+        progressBar.setIndeterminate(false);
+        progressBar.setProgress(0);
+        progressBar.setMax(slideshow_time);
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
     private void stopSlideShow() {
         boolSlideShow = false;
         tSlideShow.cancel();
         tSlideShow.purge();
+        progressBar.setIndeterminate(true);
+        progressBar.setVisibility(View.GONE);
         showToast(getResources().getString(R.string.slideshow_stop));
     }
 
