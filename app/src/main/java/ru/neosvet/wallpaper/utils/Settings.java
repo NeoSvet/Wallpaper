@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
  */
 
 public class Settings {
-    private final String VIEW = "VIEW", SITE = "site";
+    private final String VIEW = "view", SITE = "site", SLIDESHOW = "slideshow";
     public static final int ZOOMING_VIEW = 0, SIMPLE_VIEW = 1;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
@@ -23,12 +23,11 @@ public class Settings {
     }
 
     public int getView() {
-        return pref.getInt(VIEW,ZOOMING_VIEW );
+        return pref.getInt(VIEW, ZOOMING_VIEW);
     }
 
     public void setView(int mode) {
         editor.putInt(VIEW, mode);
-//        editor.apply();
     }
 
     public String getSite() {
@@ -37,6 +36,13 @@ public class Settings {
 
     public void setSite(String site) {
         editor.putString(SITE, site);
-//        editor.apply();
+    }
+
+    public int getSlideshowTime() {
+        return pref.getInt(SLIDESHOW, 4);
+    }
+
+    public void setSlideshowTime(int time) {
+        editor.putInt(SLIDESHOW, time);
     }
 }
