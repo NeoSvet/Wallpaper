@@ -92,7 +92,7 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
             if (tag == null)
                 url = site + "/wallpapers/top/page/" + page + "/order/date";
             else {
-                if(tag.contains("/")) { //categories
+                if (tag.contains("/")) { //categories
                     url = site + "/categories/view/page/" + page + tag.substring(tag.indexOf("/name"));
                 } else { //tag
                     try {
@@ -233,19 +233,20 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
 
     private String getMini(String url_image) {
         try {
-            final String link = site + url_image;
+            final String link = site + "/wallpapers/get/id" +
+                    url_image.substring(url_image.lastIndexOf("/")) + "/resolution/320x240";
             OkHttpClient client = new OkHttpClient();
             client.setConnectTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
             client.setReadTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
             Request request = new Request.Builder().url(link).build();
             Response response = client.newCall(request).execute();
-            String line = response.body().string();
-            line = line.substring(line.indexOf("ges/") + 3);
-            String s = line.substring(0, 8);
-            line = line.substring(line.indexOf("_") + 1);
-            line = line.substring(0, line.indexOf("\"") + 1);
-            s = s + line;
-            return s.substring(0, s.length() - 1);
+            BufferedReader br = new BufferedReader(response.body().charStream(), 1000);
+            String line = br.readLine();
+            while (!line.contains("full-img"))
+                line = br.readLine();
+            br.close();
+            line = line.substring(line.indexOf("src", line.indexOf("full-img")) + 5);
+            return line.substring(0, line.indexOf("\""));
         } catch (Exception e) {
             e.printStackTrace();
         }
