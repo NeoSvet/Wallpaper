@@ -4,17 +4,17 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.IBinder;
 
-import java.io.BufferedInputStream;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import ru.neosvet.wallpaper.MainActivity;
 import ru.neosvet.wallpaper.database.DBHelper;
@@ -87,24 +87,27 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
         File f = new File(getFilesDir() + Lib.CATEGORIES);
         try {
             //start:
-            URL url;
+            String url;
             if (tag.equals(""))
-                url = new URL(site + "/wallpapers/top/page/" + page + "/order/date");
+                url = site + "/wallpapers/top/page/" + page + "/order/date";
             else
-                url = new URL(site + "/tags/view/page/" + page + "/title/" + tag);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setConnectTimeout(Lib.cPing);
-            urlConnection.setReadTimeout(Lib.cPing);
-            //urlConnection.setRequestProperty(cUserAgent, cClient);
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, Lib.ENCODING), 1000);
+                url = site + "/tags/view/page/" + page + "/title/" + tag;
+            OkHttpClient client = new OkHttpClient();
+            client.setConnectTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
+            client.setReadTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
+            Request request = new Request.Builder().url(url).build();
+            Response response = client.newCall(request).execute();
+//            InputStream in = new BufferedInputStream(response.body().byteStream());
+//            BufferedReader br = new BufferedReader(new InputStreamReader(in, Lib.ENCODING), 1000);
+            BufferedReader br = new BufferedReader(response.body().charStream(), 1000);
             line = br.readLine();
             //categories:
             int u, i = line.indexOf("root-menu__flex");
+            i = line.indexOf("href", i) + 6;
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
-            while (i > 0) {
-                i = line.indexOf("href", i) + 6;
+            while (i > 5) {
                 u = line.indexOf("\"", i);
+                //https://ero.mota.ru/categories/view/name/erotica
                 bw.write(line.substring(i, u)); // url
                 bw.newLine();
                 if (line.indexOf("src", i) > 0) {
@@ -118,46 +121,50 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
                 bw.write(line.substring(i, u)); // name
                 bw.newLine();
                 bw.flush();
-                line = br.readLine();
+                i = line.indexOf("href", u) + 6;
             }
             bw.close();
             if (page == 0) {
-                in.close();
-                urlConnection.disconnect();
+                br.close();
                 status = FINISH;
                 count = FINISH_CATEGORIES;
                 return true;
             }
             //gallery:
-            String url_image;
             repository = new GalleryRepository(GalleryLoaderMotaRu.this, DBHelper.LIST);
             while (!line.contains("element"))
                 line = br.readLine();
             i = line.indexOf("\"element");
-            while (i > 0) {
-                i = line.indexOf("href", i) + 6;
-                if (i == 5) {
-                    while (!line.contains("<li>"))
-                        line = br.readLine();
-                    i = line.indexOf("href", i) + 6;
-                }
+            i = line.indexOf("href", i) + 6;
+            int end = line.lastIndexOf("deskription");
+            while (i < end) {
                 u = line.indexOf("\"", i);
                 repository.addUrl(line.substring(i, u)); // url
                 i = line.indexOf("src", u) + 5;
                 u = line.indexOf("\"", i);
                 repository.addMini(line.substring(i, u)); // mini
                 i = line.indexOf("<li>", u);
+                i = line.indexOf("href", i) + 6;
+                if (i == 5) { //skip ad block
+                    br.readLine();
+                    line = br.readLine();
+                    if (line.contains("Yandex")) {
+                        while (!line.contains("<li>"))
+                            line = br.readLine();
+                        end = line.lastIndexOf("deskription");
+                        i = line.indexOf("href", i) + 6;
+                    }
+                }
             }
             //count pages:
             if (line.contains("pagination-sourse")) {
-                line = line.substring(0,line.lastIndexOf("next"));
-                line = line.substring(0,line.lastIndexOf("</a>"));
-                line = line.substring(line.lastIndexOf(">"));
+                line = line.substring(0, line.lastIndexOf("next"));
+                line = line.substring(0, line.lastIndexOf("</a>"));
+                line = line.substring(line.lastIndexOf(">") + 1);
                 count = Integer.parseInt(line);
             }
             //finish:
-            in.close();
-            urlConnection.disconnect();
+            br.close();
             status = SAVING;
             repository.save(true);
             status = FINISH;
@@ -216,16 +223,12 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
     private String getMini(String url_image) {
         try {
             final String link = site + url_image;
-            URL url = new URL(link);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setConnectTimeout(Lib.cPing);
-            urlConnection.setReadTimeout(Lib.cPing);
-            // urlConnection.setRequestProperty(cUserAgent, cClient);
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, Lib.ENCODING), 1000);
-            String line = br.readLine();
-            in.close();
-            urlConnection.disconnect();
+            OkHttpClient client = new OkHttpClient();
+            client.setConnectTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
+            client.setReadTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
+            Request request = new Request.Builder().url(link).build();
+            Response response = client.newCall(request).execute();
+            String line = response.body().string();
             line = line.substring(line.indexOf("ges/") + 3);
             String s = line.substring(0, 8);
             line = line.substring(line.indexOf("_") + 1);

@@ -34,6 +34,10 @@
             android:name=".loaders.ImageLoader"
             android:icon="@mipmap/ic_launcher"
             android:label="ImageLoader" />
+        <service
+            android:name=".loaders.GalleryLoaderMotaRu"
+            android:icon="@mipmap/ic_launcher"
+            android:label="GalleryLoader" />
 
         <activity android:name=".SettingsActivity"></activity>
     </application>
