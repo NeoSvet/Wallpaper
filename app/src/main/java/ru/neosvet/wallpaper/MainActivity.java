@@ -196,6 +196,7 @@ public class MainActivity extends LoaderMaster
                 MainActivity.this.setTitle(getResources().getString(R.string.main));
                 loadPage(1);
             } else {//Settings.START_FAVORITE
+                loadPage(0); // load categories
                 tag = DBHelper.FAVORITE;
                 changeRep(DBHelper.FAVORITE);
             }
@@ -313,11 +314,16 @@ public class MainActivity extends LoaderMaster
     }
 
     public void onPost(boolean suc, int count) {
-        Lib.log("onPost");
         finishLoader();
         progressBar.setVisibility(View.GONE);
-        if (count == -1) {
+        if (count == GalleryLoader.FINISH_ERROR)
+            return;
+        if (count == GalleryLoader.FINISH_MINI) {
             adGallery.update();
+            return;
+        }
+        if (count == GalleryLoader.FINISH_CATEGORIES) {
+            initSections();
             return;
         }
         this.count = count;
@@ -416,7 +422,8 @@ public class MainActivity extends LoaderMaster
 
     private void loadPage(int new_page) {
         page = new_page;
-        intSrv.putExtra(DBHelper.LIST, DBHelper.LIST);
+        if(intSrv.hasExtra(DBHelper.URL))
+            intSrv.removeExtra(DBHelper.URL);
         intSrv.putExtra(Lib.PAGE, page);
         intSrv.putExtra(Lib.TAG, (tag == null ? "" : tag.replace(" ", "+")));
         startLoader();
