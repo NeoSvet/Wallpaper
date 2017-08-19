@@ -11,8 +11,8 @@ import java.io.File;
 
 public class Lib {
     public static final int TIMEOUT = 10;
-    public static final String FOLDER = "/wallpaper", SORT = "sort", CATEGORIES = "cat", PAGE = "page",
-            TAG = "tag", MODE = "mode", NAME_REP = "name_rep";
+    public static final String FOLDER = "/wallpaper", MOTARU = "mota.ru", SORT = "sort", CATEGORIES = "cat",
+            PAGE = "page", TAG = "tag", MODE = "mode", NAME_REP = "name_rep";
 
     public static void log(String msg) {
         Log.d("wallpaper", msg);

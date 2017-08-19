@@ -31,7 +31,7 @@ public class Settings {
     }
 
     public String getSite() {
-        return pref.getString(SITE, "http://mota.ru");
+        return pref.getString(SITE, "http://" + Lib.MOTARU);
     }
 
     public void setSite(String site) {
