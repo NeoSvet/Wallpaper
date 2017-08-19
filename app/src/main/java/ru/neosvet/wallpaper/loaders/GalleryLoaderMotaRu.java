@@ -92,12 +92,16 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
             if (tag == null)
                 url = site + "/wallpapers/top/page/" + page + "/order/date";
             else {
-                try {
-                    tag = URLEncoder.encode(tag, "UTF-8");
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if(tag.contains("/")) { //categories
+                    url = site + "/categories/view/page/" + page + tag.substring(tag.indexOf("/name"));
+                } else { //tag
+                    try {
+                        tag = URLEncoder.encode(tag, "UTF-8");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    url = site + "/tags/view/page/" + page + "/title/" + tag;
                 }
-                url = site + "/tags/view/page/" + page + "/title/" + tag;
             }
             OkHttpClient client = new OkHttpClient();
             client.setConnectTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);

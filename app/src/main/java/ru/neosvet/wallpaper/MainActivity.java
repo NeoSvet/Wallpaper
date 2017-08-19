@@ -43,7 +43,7 @@ public class MainActivity extends LoaderMaster
         implements GalleryAdapter.OnItemClickListener, PagesAdapter.OnPageClickListener {
     private final String COUNT = "count";
     private int page = 1, count = 0;
-    private String site, tag = null, catigory = null;// "/tags/helga+lovekaty/";
+    private String site, tag = null, category = null;// "/tags/helga+lovekaty/";
     private DrawerLayout drawer;
     private View alpha_bg, menuImport;
     private ListView lvCategories;
@@ -161,7 +161,7 @@ public class MainActivity extends LoaderMaster
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 tag = lCategory.get(i);
-                catigory = adCategory.getItem(i);
+                category = adCategory.getItem(i);
                 loadPage(1);
                 lvCategories.setVisibility(View.GONE);
                 alpha_bg.setVisibility(View.GONE);
@@ -202,7 +202,7 @@ public class MainActivity extends LoaderMaster
                 changeRep(DBHelper.FAVORITE);
             }
         } else {
-            catigory = state.getString(Lib.CATEGORIES);
+            category = state.getString(Lib.CATEGORIES);
             page = state.getInt(Lib.PAGE);
             count = state.getInt(COUNT);
             tag = state.getString(Lib.TAG);
@@ -215,7 +215,7 @@ public class MainActivity extends LoaderMaster
     protected void onSaveInstanceState(Bundle outState) {
         if (adGallery != null)
             outState.putString(Lib.NAME_REP, adGallery.getName());
-        outState.putString(Lib.CATEGORIES, catigory);
+        outState.putString(Lib.CATEGORIES, category);
         outState.putInt(Lib.PAGE, page);
         outState.putInt(COUNT, count);
         outState.putString(Lib.TAG, tag);
@@ -224,7 +224,7 @@ public class MainActivity extends LoaderMaster
 
     private boolean unTag() {
         if (tag != null) {
-            catigory = null;
+            category = null;
             tag = null;
             loadPage(1);
             return true;
@@ -344,7 +344,10 @@ public class MainActivity extends LoaderMaster
             String s;
             while ((s = br.readLine()) != null) {
                 lCategory.add(s);
-                adCategory.add(br.readLine());
+                s = br.readLine();
+                if (s.contains(".png"))
+                    s += "@" + br.readLine();
+                adCategory.add(s);
             }
             br.close();
             lvCategories.setAdapter(adCategory);
@@ -378,8 +381,8 @@ public class MainActivity extends LoaderMaster
         }
 
         if (mode_srv != UNBOUND_SERVICE) {
-            if (catigory != null)
-                MainActivity.this.setTitle(catigory);
+            if (category != null)
+                MainActivity.this.setTitle(category);
             else if (tag != null)
                 MainActivity.this.setTitle(getResources().getString(R.string.tag)
                         + " " + tag);
@@ -410,7 +413,7 @@ public class MainActivity extends LoaderMaster
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data != null) {
-            catigory = null;
+            category = null;
             tag = data.getStringExtra(Lib.TAG);
             loadPage(1);
         }
@@ -423,7 +426,7 @@ public class MainActivity extends LoaderMaster
 
     private void loadPage(int new_page) {
         page = new_page;
-        if(intSrv.hasExtra(DBHelper.URL))
+        if (intSrv.hasExtra(DBHelper.URL))
             intSrv.removeExtra(DBHelper.URL);
         intSrv.putExtra(Lib.PAGE, page);
         intSrv.putExtra(Lib.TAG, tag);
