@@ -1,4 +1,4 @@
-package ru.neosvet.wallpaper.utils;
+package ru.neosvet.wallpaper.loaders;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -14,6 +14,9 @@ import java.net.URL;
 import ru.neosvet.wallpaper.ImageActivity;
 import ru.neosvet.wallpaper.R;
 import ru.neosvet.wallpaper.database.DBHelper;
+import ru.neosvet.wallpaper.utils.Lib;
+import ru.neosvet.wallpaper.utils.LoaderMaster;
+import ru.neosvet.wallpaper.utils.Settings;
 
 /**
  * Created by NeoSvet on 06.08.2017.

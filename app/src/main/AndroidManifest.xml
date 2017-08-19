@@ -27,11 +27,11 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service
-            android:name=".utils.GalleryLoader"
+            android:name=".loaders.GalleryLoader"
             android:icon="@mipmap/ic_launcher"
             android:label="GalleryLoader" />
         <service
-            android:name=".utils.ImageLoader"
+            android:name=".loaders.ImageLoader"
             android:icon="@mipmap/ic_launcher"
             android:label="ImageLoader" />
 

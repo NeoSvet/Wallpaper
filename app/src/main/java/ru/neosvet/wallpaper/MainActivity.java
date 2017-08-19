@@ -33,7 +33,7 @@ import ru.neosvet.wallpaper.adapters.PagesAdapter;
 import ru.neosvet.wallpaper.database.DBHelper;
 import ru.neosvet.wallpaper.database.GalleryRepository;
 import ru.neosvet.wallpaper.ui.Tip;
-import ru.neosvet.wallpaper.utils.GalleryLoader;
+import ru.neosvet.wallpaper.loaders.GalleryLoader;
 import ru.neosvet.wallpaper.utils.Lib;
 import ru.neosvet.wallpaper.utils.LoaderMaster;
 import ru.neosvet.wallpaper.utils.Settings;

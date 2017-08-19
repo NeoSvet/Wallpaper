@@ -40,7 +40,7 @@ import ru.neosvet.wallpaper.database.GalleryRepository;
 import ru.neosvet.wallpaper.ui.CustomImageView;
 import ru.neosvet.wallpaper.ui.HistoryItem;
 import ru.neosvet.wallpaper.ui.Tip;
-import ru.neosvet.wallpaper.utils.ImageLoader;
+import ru.neosvet.wallpaper.loaders.ImageLoader;
 import ru.neosvet.wallpaper.utils.Lib;
 import ru.neosvet.wallpaper.utils.LoaderMaster;
 import ru.neosvet.wallpaper.utils.Settings;

@@ -1,4 +1,4 @@
-package ru.neosvet.wallpaper.utils;
+package ru.neosvet.wallpaper.loaders;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -19,16 +19,19 @@ import java.util.List;
 import ru.neosvet.wallpaper.MainActivity;
 import ru.neosvet.wallpaper.database.DBHelper;
 import ru.neosvet.wallpaper.database.GalleryRepository;
+import ru.neosvet.wallpaper.utils.Lib;
+import ru.neosvet.wallpaper.utils.LoaderMaster;
+import ru.neosvet.wallpaper.utils.Settings;
 
 /**
- * Created by NeoSvet on 19.08.2017.
+ * Created by NeoSvet on 06.08.2017.
  */
 
-public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.IService {
+public class GalleryLoader extends IntentService implements LoaderMaster.IService {
     private final byte WORK = 0, SAVING = 1, FINISH = 2, ERROR = 3;
     public static final int FINISH_ERROR = -1, FINISH_MINI = -2, FINISH_CATEGORIES = -3;
     private byte status = WORK;
-    private final IBinder binder = new LoaderMaster.MyBinder(GalleryLoaderMotaRu.this);
+    private final IBinder binder = new LoaderMaster.MyBinder(GalleryLoader.this);
     private int count = 0;
     private GalleryRepository repository;
     private List<String> urls = new LinkedList<String>();
@@ -40,7 +43,7 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
         this.act = (MainActivity) act;
     }
 
-    public GalleryLoaderMotaRu() {
+    public GalleryLoader() {
         super("GalleryLoader");
     }
 
@@ -52,14 +55,14 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
     @Override
     protected void onHandleIntent(Intent intent) {
         if (site == null) {
-            Settings settings = new Settings(GalleryLoaderMotaRu.this);
+            Settings settings = new Settings(GalleryLoader.this);
             site = settings.getSite();
         }
         if (intent.hasExtra(DBHelper.URL)) { // load mini
             status = WORK;
             urls.add(intent.getStringExtra(DBHelper.URL));
             if (repository == null)
-                repository = new GalleryRepository(GalleryLoaderMotaRu.this, intent.getStringExtra(DBHelper.LIST));
+                repository = new GalleryRepository(GalleryLoader.this, intent.getStringExtra(DBHelper.LIST));
             if (!boolThread)
                 startThread();
             status = FINISH;
@@ -84,11 +87,7 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
         File f = new File(getFilesDir() + Lib.CATEGORIES);
         try {
             //start:
-            URL url;
-            if (tag.equals(""))
-                url = new URL(site + "/wallpapers/top/page/" + page + "/order/date");
-            else
-                url = new URL(site + "/tags/view/page/" + page + "/title/" + tag);
+            URL url = new URL(site + tag + "/page/" + page + "/");
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(Lib.cPing);
             urlConnection.setReadTimeout(Lib.cPing);
@@ -97,24 +96,21 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
             BufferedReader br = new BufferedReader(new InputStreamReader(in, Lib.ENCODING), 1000);
             line = br.readLine();
             //categories:
-            int u, i = line.indexOf("root-menu__flex");
+            while (!line.contains("Sandbox"))
+                line = br.readLine();
+            line = br.readLine();
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
-            while (i > 0) {
-                i = line.indexOf("href", i) + 6;
-                u = line.indexOf("\"", i);
-                bw.write(line.substring(i, u)); // url
-                bw.newLine();
-                if (line.indexOf("src", i) > 0) {
-                    i = line.indexOf("src", u) + 5;
-                    u = line.indexOf("\"", i);
-                    bw.write(line.substring(i, u)); // icon
+            while (!line.contains("</ul>")) {
+                if (line.contains("href")) {
+                    line = line.substring(line.indexOf("href") + 6,
+                            line.indexOf(">") - 2);
+                    bw.write(line);
                     bw.newLine();
+                    line = br.readLine();
+                    bw.write(line.trim().replace("amp;", ""));
+                    bw.newLine();
+                    bw.flush();
                 }
-                i = line.indexOf("span", u) + 5;
-                u = line.indexOf("<", i);
-                bw.write(line.substring(i, u)); // name
-                bw.newLine();
-                bw.flush();
                 line = br.readLine();
             }
             bw.close();
@@ -127,29 +123,38 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
             }
             //gallery:
             String url_image;
-            repository = new GalleryRepository(GalleryLoaderMotaRu.this, DBHelper.LIST);
-            while (!line.contains("element"))
+            repository = new GalleryRepository(GalleryLoader.this, DBHelper.LIST);
+            while (!line.contains("col-md-4"))
                 line = br.readLine();
-            i = line.indexOf("\"element");
-            while (i > 0) {
-                i = line.indexOf("href", i) + 6;
-                if (i == 5) {
-                    while (!line.contains("<li>"))
+            while (!line.contains("<nav>") && !line.contains("<noindex>")) {
+                line = br.readLine();
+                if (line.contains("thumbnail")) {
+                    line = br.readLine();
+                    line = line.substring(line.indexOf("href") + 6);
+                    url_image = line.substring(0, line.indexOf("\""));
+                    repository.addUrl(url_image);
+                    line = br.readLine();
+                    if (line.contains("holder.js")) //for tag
                         line = br.readLine();
-                    i = line.indexOf("href", i) + 6;
+                    line = line.substring(line.indexOf(site) + site.length() + 5, line.length() - 1);
+                    repository.addMini(line);
                 }
-                u = line.indexOf("\"", i);
-                repository.addUrl(line.substring(i, u)); // url
-                i = line.indexOf("src", u) + 5;
-                u = line.indexOf("\"", i);
-                repository.addMini(line.substring(i, u)); // mini
-                i = line.indexOf("<li>", u);
             }
             //count pages:
-            if (line.contains("pagination-sourse")) {
-                line = line.substring(0,line.lastIndexOf("next"));
-                line = line.substring(0,line.lastIndexOf("</a>"));
-                line = line.substring(line.lastIndexOf(">"));
+            if (line.contains("<nav>")) {
+                line = br.readLine();
+                while (!line.contains("next") && !line.contains("last")) {
+                    line += br.readLine();
+                }
+                if (line.contains("last")) {
+                    line = line.substring(0, line.indexOf("current") - 2);
+                    line = line.substring(line.lastIndexOf(">") + 1);
+                    line = line.substring(0, line.indexOf(" "));
+                } else {
+                    line = line.substring(0, line.indexOf("next"));
+                    line = line.substring(line.lastIndexOf("\">") + 2);
+                    line = line.substring(0, line.indexOf("<"));
+                }
                 count = Integer.parseInt(line);
             }
             //finish:
