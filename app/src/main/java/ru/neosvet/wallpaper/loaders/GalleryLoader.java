@@ -4,17 +4,17 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.IBinder;
 
-import java.io.BufferedInputStream;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import ru.neosvet.wallpaper.MainActivity;
 import ru.neosvet.wallpaper.database.DBHelper;
@@ -87,13 +87,15 @@ public class GalleryLoader extends IntentService implements LoaderMaster.IServic
         File f = new File(getFilesDir() + Lib.CATEGORIES);
         try {
             //start:
-            URL url = new URL(site + tag + "/page/" + page + "/");
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setConnectTimeout(Lib.cPing);
-            urlConnection.setReadTimeout(Lib.cPing);
-            //urlConnection.setRequestProperty(cUserAgent, cClient);
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, Lib.ENCODING), 1000);
+            OkHttpClient client = new OkHttpClient();
+            client.setConnectTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
+            client.setReadTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
+            String url = site + tag + "/page/" + page + "/";
+            Request request = new Request.Builder().url(url).build();
+            Response response = client.newCall(request).execute();
+//            InputStream in = new BufferedInputStream(response.body().byteStream());
+//            BufferedReader br = new BufferedReader(new InputStreamReader(in, Lib.ENCODING), 1000);
+            BufferedReader br = new BufferedReader(response.body().charStream(), 1000);
             line = br.readLine();
             //categories:
             while (!line.contains("Sandbox"))
@@ -115,8 +117,7 @@ public class GalleryLoader extends IntentService implements LoaderMaster.IServic
             }
             bw.close();
             if (page == 0) {
-                in.close();
-                urlConnection.disconnect();
+                br.close();
                 status = FINISH;
                 count = FINISH_CATEGORIES;
                 return true;
@@ -136,7 +137,7 @@ public class GalleryLoader extends IntentService implements LoaderMaster.IServic
                     line = br.readLine();
                     if (line.contains("holder.js")) //for tag
                         line = br.readLine();
-                    line = line.substring(line.indexOf(site) + site.length() + 5, line.length() - 1);
+                    line = line.substring(line.indexOf(site) + site.length(), line.length() - 1);
                     repository.addMini(line);
                 }
             }
@@ -158,8 +159,7 @@ public class GalleryLoader extends IntentService implements LoaderMaster.IServic
                 count = Integer.parseInt(line);
             }
             //finish:
-            in.close();
-            urlConnection.disconnect();
+            br.close();
             status = SAVING;
             repository.save(true);
             status = FINISH;
@@ -218,22 +218,18 @@ public class GalleryLoader extends IntentService implements LoaderMaster.IServic
     private String getMini(String url_image) {
         try {
             final String link = site + url_image;
-            URL url = new URL(link);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setConnectTimeout(Lib.cPing);
-            urlConnection.setReadTimeout(Lib.cPing);
-            // urlConnection.setRequestProperty(cUserAgent, cClient);
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, Lib.ENCODING), 1000);
-            String line = br.readLine();
-            in.close();
-            urlConnection.disconnect();
+            OkHttpClient client = new OkHttpClient();
+            client.setConnectTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
+            client.setReadTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
+            Request request = new Request.Builder().url(link).build();
+            Response response = client.newCall(request).execute();
+            String line = response.body().string();
             line = line.substring(line.indexOf("ges/") + 3);
             String s = line.substring(0, 8);
             line = line.substring(line.indexOf("_") + 1);
             line = line.substring(0, line.indexOf("\"") + 1);
             s = s + line;
-            return s.substring(0, s.length() - 1);
+            return "/mini" + s.substring(0, s.length() - 1);
         } catch (Exception e) {
             e.printStackTrace();
         }

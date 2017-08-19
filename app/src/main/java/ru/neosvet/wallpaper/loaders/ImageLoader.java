@@ -4,12 +4,12 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.IBinder;
 
-import java.io.BufferedInputStream;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+
 import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import ru.neosvet.wallpaper.ImageActivity;
 import ru.neosvet.wallpaper.R;
@@ -92,15 +92,15 @@ public class ImageLoader extends IntentService implements LoaderMaster.IService 
         }
     }
 
-    private boolean load(String adr, boolean onlyCarousel) {
+    private boolean load(String url, boolean onlyCarousel) {
         try {
-            link = adr;
-            URL url = new URL(site + link);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setConnectTimeout(Lib.cPing);
-            urlConnection.setReadTimeout(Lib.cPing);
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            BufferedReader br = new BufferedReader(new InputStreamReader(in), 1000);
+            link = url;
+            OkHttpClient client = new OkHttpClient();
+            client.setConnectTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
+            client.setReadTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
+            Request request = new Request.Builder().url(site + link).build();
+            Response response = client.newCall(request).execute();
+            BufferedReader br = new BufferedReader(response.body().charStream(), 1000);
             String line = br.readLine();
             if (!onlyCarousel) {
                 while (!line.contains("/large"))
@@ -115,7 +115,7 @@ public class ImageLoader extends IntentService implements LoaderMaster.IService 
                     line = line.substring(0, line.indexOf("\"") - 3) + "1920_1080";
                 else
                     line = line.substring(0, line.indexOf("\"") - 3) + "1280_800";
-                url = new URL(line); // screen_w + "x" + screen_h
+                request = new Request.Builder().url(line).build(); // screen_w + "x" + screen_h
 
                 while (!line.contains("Wallpaper tags"))
                     line = br.readLine();
@@ -150,24 +150,19 @@ public class ImageLoader extends IntentService implements LoaderMaster.IService 
                 }
                 carousel.delete(carousel.length() - 1, carousel.length());
             }
-            in.close();
-            urlConnection.disconnect();
+            br.close();
 
             if (onlyCarousel)
                 return true;
 
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setConnectTimeout(Lib.cPing);
-            urlConnection.setReadTimeout(Lib.cPing);
-            in = new BufferedInputStream(urlConnection.getInputStream());
-            br = new BufferedReader(new InputStreamReader(in), 1000);
+            response = client.newCall(request).execute();
+            br = new BufferedReader(response.body().charStream(), 1000);
             while (!line.contains("photo\""))
                 line = br.readLine();
             line = br.readLine();
             line = line.substring(line.indexOf("src") + 5);
             link = line.substring(0, line.indexOf("\""));
-            in.close();
-            urlConnection.disconnect();
+            br.close();
 
             return true;
         } catch (Exception e) {

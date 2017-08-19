@@ -29,6 +29,7 @@ dependencies {
     compile 'com.android.support:design:25.3.1'
     compile 'com.squareup.picasso:picasso:2.5.2' // for download picture
     compile 'com.davemorrissey.labs:subsampling-scale-image-view:3.4.1'  // for ImageActivity
+    compile 'com.squareup.okhttp:okhttp:2.4.0' // HTTP client
     compile 'com.android.support:support-v4:25.3.1'
     testCompile 'junit:junit:4.12'
 }
