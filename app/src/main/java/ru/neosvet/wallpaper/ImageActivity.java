@@ -37,10 +37,10 @@ import java.util.TimerTask;
 import ru.neosvet.wallpaper.adapters.UniAdapter;
 import ru.neosvet.wallpaper.database.DBHelper;
 import ru.neosvet.wallpaper.database.GalleryRepository;
+import ru.neosvet.wallpaper.loaders.ImageLoaderMotaRu;
 import ru.neosvet.wallpaper.ui.CustomImageView;
 import ru.neosvet.wallpaper.ui.HistoryItem;
 import ru.neosvet.wallpaper.ui.Tip;
-import ru.neosvet.wallpaper.loaders.ImageLoader;
 import ru.neosvet.wallpaper.utils.Lib;
 import ru.neosvet.wallpaper.utils.LoaderMaster;
 import ru.neosvet.wallpaper.utils.Settings;
@@ -80,7 +80,7 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
         initGesturesImage();
         dpi = getResources().getDisplayMetrics().density;
 
-        intSrv = new Intent(ImageActivity.this, ImageLoader.class);
+        intSrv = new Intent(ImageActivity.this, ImageLoaderMotaRu.class);
         fav = new GalleryRepository(ImageActivity.this, DBHelper.FAVORITE);
         recent = new GalleryRepository(ImageActivity.this, DBHelper.RECENT);
         restoreActivityState(savedInstanceState);

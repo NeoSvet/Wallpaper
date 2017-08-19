@@ -25,6 +25,7 @@
         <activity
             android:name=".ImageActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".SettingsActivity"></activity>
 
         <service
             android:name=".loaders.GalleryLoader"
@@ -38,8 +39,10 @@
             android:name=".loaders.GalleryLoaderMotaRu"
             android:icon="@mipmap/ic_launcher"
             android:label="GalleryLoader" />
-
-        <activity android:name=".SettingsActivity"></activity>
+        <service
+            android:name=".loaders.ImageLoaderMotaRu"
+            android:icon="@mipmap/ic_launcher"
+            android:label="ImageLoader" />
     </application>
 
 </manifest>
