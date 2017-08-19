@@ -69,7 +69,10 @@ public class MainActivity extends LoaderMaster
         File d = new File(Lib.getFolder() + Lib.FOLDER);
         if (!d.exists()) d.mkdir();
 
-        intSrv = new Intent(MainActivity.this, GalleryLoaderMotaRu.class);
+        if (site.contains(Lib.MOTARU))
+            intSrv = new Intent(MainActivity.this, GalleryLoaderMotaRu.class);
+        else
+            intSrv = new Intent(MainActivity.this, GalleryLoader.class);
         restoreActivityState(savedInstanceState);
     }
 
