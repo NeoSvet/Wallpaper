@@ -96,7 +96,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     }
 
     public void update() {
-        Lib.log("update");
         repository.load(DESC);
         GalleryAdapter.this.notifyDataSetChanged();
     }

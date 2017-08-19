@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Random;
 
 import ru.neosvet.wallpaper.ui.GalleryItem;
-import ru.neosvet.wallpaper.utils.Lib;
 
 /**
  * Created by NeoSvet on 14.07.2017.
@@ -72,7 +71,6 @@ public class GalleryRepository {
     }
 
     public void addMini(String url, String mini) {
-        Lib.log("addMini: " + mini);
         for (int i = index; i < data.size(); i++) {
             if (data.get(i).getUrl().equals(url)) {
                 data.get(i).setMini(mini);
@@ -83,7 +81,6 @@ public class GalleryRepository {
     }
 
     public void updateMini(String url, String mini) {
-        Lib.log("updateMini: " + mini);
         SQLiteDatabase dataBase = helper.getWritableDatabase();
         ContentValues field = new ContentValues();
         field.put(DBHelper.MINI, mini);
