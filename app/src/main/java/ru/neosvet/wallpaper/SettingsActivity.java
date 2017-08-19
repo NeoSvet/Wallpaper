@@ -48,7 +48,7 @@ public class SettingsActivity extends AppCompatActivity {
         spViewObject = (Spinner) findViewById(R.id.spViewObject);
         spViewObject.setPopupBackgroundResource(R.drawable.cell_none);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                this, R.layout.list_item, new String[]{"Zooming View", "Simple View"});
+                this, R.layout.spiner_item, new String[]{"Zooming View", "Simple View"});
         spViewObject.setAdapter(adapter);
         spViewObject.setSelection(settings.getView());
     }
@@ -79,7 +79,7 @@ public class SettingsActivity extends AppCompatActivity {
         spStartOpen = (Spinner) findViewById(R.id.spStartOpen);
         spStartOpen.setPopupBackgroundResource(R.drawable.cell_none);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                this, R.layout.list_item, new String[]{
+                this, R.layout.spiner_item, new String[]{
                 getResources().getString(R.string.main), getResources().getString(R.string.favorite)});
         spStartOpen.setAdapter(adapter);
         spStartOpen.setSelection(settings.getStartOpen());
