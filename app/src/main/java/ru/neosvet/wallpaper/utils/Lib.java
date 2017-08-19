@@ -24,9 +24,11 @@ public class Lib {
     }
 
     public static File getFile(String url) {
-        if (url.contains("/") && url.contains("-")) {
+        if (url.contains("/")) {
             url = url.substring(url.lastIndexOf("/"));
-            url = url.substring(0, url.indexOf("-")) + ".jpg";
+            if (url.contains("-"))
+                url = url.substring(0, url.indexOf("-"));
+            url += ".jpg";
         }
         return new File(getFolder() + "/wallpaper" + url);
     }
