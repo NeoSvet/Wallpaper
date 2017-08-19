@@ -33,6 +33,7 @@ import ru.neosvet.wallpaper.adapters.PagesAdapter;
 import ru.neosvet.wallpaper.database.DBHelper;
 import ru.neosvet.wallpaper.database.GalleryRepository;
 import ru.neosvet.wallpaper.loaders.GalleryLoader;
+import ru.neosvet.wallpaper.loaders.GalleryLoaderMotaRu;
 import ru.neosvet.wallpaper.ui.Tip;
 import ru.neosvet.wallpaper.utils.Lib;
 import ru.neosvet.wallpaper.utils.LoaderMaster;
@@ -68,7 +69,7 @@ public class MainActivity extends LoaderMaster
         File d = Lib.getFile("");
         if (!d.exists()) d.mkdir();
 
-        intSrv = new Intent(MainActivity.this, GalleryLoader.class);
+        intSrv = new Intent(MainActivity.this, GalleryLoaderMotaRu.class);
         restoreActivityState(savedInstanceState);
     }
 
@@ -271,7 +272,7 @@ public class MainActivity extends LoaderMaster
             String s;
             while ((s = br.readLine()) != null) {
                 fav.addUrl(getWithoutSite(s));
-                fav.addMini(getWithoutSite(br.readLine()).replace("/mini", ""));
+                fav.addMini(getWithoutSite(br.readLine()));
             }
             br.close();
             fav.save(REPLACE);

@@ -68,7 +68,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                 site = settings.getSite();
             }
             Picasso.with(act)
-                    .load(site + "/mini" + repository.getMini(position))
+                    .load(site + repository.getMini(position))
                     .placeholder(R.drawable.load_image)
                     .error(R.drawable.no_image)
                     .into(holder.image);
