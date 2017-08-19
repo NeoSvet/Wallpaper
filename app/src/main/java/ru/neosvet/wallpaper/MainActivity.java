@@ -75,14 +75,6 @@ public class MainActivity extends LoaderMaster
     private void initNavigationMenu() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                lvSections.setVisibility(View.GONE);
-                menuImport.setVisibility(View.GONE);
-                alpha_bg.setVisibility(View.GONE);
-            }
-        });
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
