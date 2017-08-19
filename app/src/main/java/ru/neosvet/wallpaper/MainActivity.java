@@ -382,7 +382,7 @@ public class MainActivity extends LoaderMaster
                 MainActivity.this.setTitle(catigory);
             else if (tag != null)
                 MainActivity.this.setTitle(getResources().getString(R.string.tag)
-                        + " " + tag.substring(6));
+                        + " " + tag);
             else
                 MainActivity.this.setTitle(getResources().getString(R.string.main));
         }
@@ -411,7 +411,7 @@ public class MainActivity extends LoaderMaster
         super.onActivityResult(requestCode, resultCode, data);
         if (data != null) {
             catigory = null;
-            tag = "/tags/" + data.getStringExtra(Lib.TAG);
+            tag = data.getStringExtra(Lib.TAG);
             loadPage(1);
         }
     }
@@ -426,7 +426,7 @@ public class MainActivity extends LoaderMaster
         if(intSrv.hasExtra(DBHelper.URL))
             intSrv.removeExtra(DBHelper.URL);
         intSrv.putExtra(Lib.PAGE, page);
-        intSrv.putExtra(Lib.TAG, (tag == null ? "" : tag.replace(" ", "+")));
+        intSrv.putExtra(Lib.TAG, tag);
         startLoader();
     }
 

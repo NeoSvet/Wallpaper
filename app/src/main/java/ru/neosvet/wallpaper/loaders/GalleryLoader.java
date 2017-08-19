@@ -90,7 +90,11 @@ public class GalleryLoader extends IntentService implements LoaderMaster.IServic
             OkHttpClient client = new OkHttpClient();
             client.setConnectTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
             client.setReadTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
-            String url = site + tag + "/page/" + page + "/";
+            String url;
+            if (tag == null)
+                url = site + "/page/" + page + "/";
+            else
+                url = site + "/tags" + tag.replace(" ", "+") + "/page/" + page + "/";
             Request request = new Request.Builder().url(url).build();
             Response response = client.newCall(request).execute();
 //            InputStream in = new BufferedInputStream(response.body().byteStream());

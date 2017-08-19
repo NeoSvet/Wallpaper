@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -88,10 +89,16 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
         try {
             //start:
             String url;
-            if (tag.equals(""))
+            if (tag == null)
                 url = site + "/wallpapers/top/page/" + page + "/order/date";
-            else
+            else {
+                try {
+                    tag = URLEncoder.encode(tag, "UTF-8");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 url = site + "/tags/view/page/" + page + "/title/" + tag;
+            }
             OkHttpClient client = new OkHttpClient();
             client.setConnectTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
             client.setReadTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
