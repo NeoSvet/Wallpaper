@@ -9,7 +9,9 @@
     <string name="refresh">Обновить</string>
     <string name="reverse">Обратный порядок</string>
     <string name="mix">Перемешать</string>
-    <string name="inport">Импорт</string>
+    <string name="string_import">Импорт</string>
+    <string name="replace_list">Заменить список</string>
+    <string name="add_list">Дополнить список</string>
     <string name="export">Экспорт</string>
     <string name="ready">Готово</string>
     <string name="tags">Теги</string>

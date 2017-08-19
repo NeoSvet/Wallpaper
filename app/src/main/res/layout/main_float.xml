@@ -38,11 +38,50 @@
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true" />
 
+    <View
+        android:id="@+id/alpha_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#33000000"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/menuImport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="80dp"
+        android:layout_marginLeft="40dp"
+        android:background="@drawable/field"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/cmdReplsaceList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="@string/replace_list"
+            android:textColor="@android:color/white"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/cmdAddList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="@string/add_list"
+            android:textColor="@android:color/white"
+            android:textSize="22sp" />
+    </LinearLayout>
+
     <ListView
         android:id="@+id/lvSections"
         android:layout_width="200dp"
         android:layout_height="match_parent"
-        android:layout_centerInParent="true"
+        android:layout_marginBottom="50dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="50dp"
         android:background="@drawable/field"
         android:visibility="gone" />
 

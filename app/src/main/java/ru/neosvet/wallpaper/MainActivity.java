@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
@@ -38,10 +39,12 @@ import ru.neosvet.wallpaper.utils.LoaderMaster;
 import ru.neosvet.wallpaper.utils.Settings;
 
 public class MainActivity extends LoaderMaster
-        implements NavigationView.OnNavigationItemSelectedListener, GalleryAdapter.OnItemClickListener, PagesAdapter.OnPageClickListener {
+        implements GalleryAdapter.OnItemClickListener, PagesAdapter.OnPageClickListener {
     private final String COUNT = "count";
     private int page = 1, count = 0;
     private String site, tag = null, catigory = null;// "/tags/helga+lovekaty/";
+    private DrawerLayout drawer;
+    private View alpha_bg, menuImport;
     private ListView lvSections;
     private List<String> lSections = new ArrayList<String>();
     private Tip tip;
@@ -59,6 +62,7 @@ public class MainActivity extends LoaderMaster
         verifyStoragePermissions();
 
         initSettings();
+        initNavigationMenu();
         initUI();
 
         File d = Lib.getFile("");
@@ -66,6 +70,68 @@ public class MainActivity extends LoaderMaster
 
         intSrv = new Intent(MainActivity.this, GalleryLoader.class);
         restoreActivityState(savedInstanceState);
+    }
+
+    private void initNavigationMenu() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                lvSections.setVisibility(View.GONE);
+                menuImport.setVisibility(View.GONE);
+                alpha_bg.setVisibility(View.GONE);
+            }
+        });
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.nav_main:
+                        if (!unTag()) changeRep(DBHelper.LIST);
+                        break;
+                    case R.id.nav_sections:
+                        lvSections.setVisibility(View.VISIBLE);
+                        alpha_bg.setVisibility(View.VISIBLE);
+                        break;
+                    case R.id.nav_favorite:
+                        changeRep(DBHelper.FAVORITE);
+                        break;
+                    case R.id.nav_recent:
+                        changeRep(DBHelper.RECENT);
+                        break;
+                    case R.id.nav_settings:
+                        startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                        break;
+                    case R.id.nav_refresh:
+                        loadPage(page);
+                        break;
+                    case R.id.nav_reverse:
+                        adGallery.reverse();
+                        break;
+                    case R.id.nav_mix:
+                        adGallery.mix();
+                        break;
+                    case R.id.nav_import:
+                        menuImport.setVisibility(View.VISIBLE);
+                        alpha_bg.setVisibility(View.VISIBLE);
+                        break;
+                    case R.id.nav_export:
+                        if (adGallery.export())
+                            tip.show();
+                        break;
+                }
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
     }
 
     private void initSettings() {
@@ -90,19 +156,9 @@ public class MainActivity extends LoaderMaster
     }
 
     private void initUI() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        alpha_bg = findViewById(R.id.alpha_bg);
+        menuImport = findViewById(R.id.menuImport);
         rvGallery = (RecyclerView) findViewById(R.id.rvGallery);
         rvPages = (RecyclerView) findViewById(R.id.rvPages);
         lvSections = (ListView) findViewById(R.id.lvSections);
@@ -115,6 +171,27 @@ public class MainActivity extends LoaderMaster
                 catigory = adCategory.getItem(i);
                 loadPage(1);
                 lvSections.setVisibility(View.GONE);
+                alpha_bg.setVisibility(View.GONE);
+            }
+        });
+        alpha_bg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                lvSections.setVisibility(View.GONE);
+                menuImport.setVisibility(View.GONE);
+                alpha_bg.setVisibility(View.GONE);
+            }
+        });
+        findViewById(R.id.cmdReplsaceList).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cmdImport(true);
+            }
+        });
+        findViewById(R.id.cmdAddList).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cmdImport(false);
             }
         });
     }
@@ -163,12 +240,17 @@ public class MainActivity extends LoaderMaster
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             if (lvSections.getVisibility() == View.VISIBLE) {
                 lvSections.setVisibility(View.GONE);
+                alpha_bg.setVisibility(View.GONE);
+                return;
+            }
+            if (menuImport.getVisibility() == View.VISIBLE) {
+                menuImport.setVisibility(View.GONE);
+                alpha_bg.setVisibility(View.GONE);
                 return;
             }
             if (unTag()) return;
@@ -185,48 +267,9 @@ public class MainActivity extends LoaderMaster
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.nav_main:
-                if (!unTag()) changeRep(DBHelper.LIST);
-                break;
-            case R.id.nav_sections:
-                lvSections.setVisibility(View.VISIBLE);
-                break;
-            case R.id.nav_favorite:
-                changeRep(DBHelper.FAVORITE);
-                break;
-            case R.id.nav_recent:
-                changeRep(DBHelper.RECENT);
-                break;
-            case R.id.nav_settings:
-                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-                break;
-            case R.id.nav_refresh:
-                loadPage(page);
-                break;
-            case R.id.nav_reverse:
-                adGallery.reverse();
-                break;
-            case R.id.nav_mix:
-                adGallery.mix();
-                break;
-            case R.id.nav_import:
-                cmdImport();
-                break;
-            case R.id.nav_export:
-                if (adGallery.export())
-                    tip.show();
-                break;
-        }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    private void cmdImport() {
+    private void cmdImport(boolean REPLACE) {
+        menuImport.setVisibility(View.GONE);
+        alpha_bg.setVisibility(View.GONE);
         try {
             File f = new File(Lib.getFolder() + "/fav");
             if (!f.exists()) return;
@@ -238,7 +281,7 @@ public class MainActivity extends LoaderMaster
                 fav.addMini(getWithoutSite(br.readLine()).replace("/mini", ""));
             }
             br.close();
-            fav.save(false);
+            fav.save(REPLACE);
             f.delete();
             tip.show();
         } catch (Exception e) {
