@@ -66,7 +66,7 @@ public class MainActivity extends LoaderMaster
         initNavigationMenu();
         initUI();
 
-        File d = Lib.getFile("");
+        File d = new File(Lib.getFolder() + Lib.FOLDER);
         if (!d.exists()) d.mkdir();
 
         intSrv = new Intent(MainActivity.this, GalleryLoaderMotaRu.class);
@@ -249,10 +249,9 @@ public class MainActivity extends LoaderMaster
             }
             if (unTag()) return;
             try {
-                File d = Lib.getFile("");
-                for (File f : d.listFiles()) {
+                File d = new File(Lib.getFolder() + Lib.FOLDER);
+                for (File f : d.listFiles())
                     f.delete();
-                }
                 d.delete();
             } catch (Exception e) {
                 e.printStackTrace();

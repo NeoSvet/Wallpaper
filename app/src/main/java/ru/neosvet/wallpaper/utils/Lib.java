@@ -11,7 +11,7 @@ import java.io.File;
 
 public class Lib {
     public static final int TIMEOUT = 10;
-    public static final String SORT = "sort", CATEGORIES = "cat", PAGE = "page",
+    public static final String FOLDER = "/wallpaper", SORT = "sort", CATEGORIES = "cat", PAGE = "page",
             TAG = "tag", MODE = "mode", NAME_REP = "name_rep";
 
     public static void log(String msg) {
@@ -28,8 +28,7 @@ public class Lib {
             url = url.substring(url.lastIndexOf("/"));
             if (url.contains("-"))
                 url = url.substring(0, url.indexOf("-"));
-            url += ".jpg";
         }
-        return new File(getFolder() + "/wallpaper" + url);
+        return new File(getFolder() + FOLDER + url + ".jpg");
     }
 }
