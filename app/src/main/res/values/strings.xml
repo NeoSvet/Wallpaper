@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">НеоОбои</string>
     <string name="main">Главная</string>
-    <string name="sections">Разделы</string>
+    <string name="categories">Разделы</string>
     <string name="favorite">Избранное</string>
     <string name="recent">Недавние</string>
     <string name="settings">Настройки</string>

@@ -32,8 +32,8 @@ import ru.neosvet.wallpaper.adapters.ListAdapter;
 import ru.neosvet.wallpaper.adapters.PagesAdapter;
 import ru.neosvet.wallpaper.database.DBHelper;
 import ru.neosvet.wallpaper.database.GalleryRepository;
-import ru.neosvet.wallpaper.ui.Tip;
 import ru.neosvet.wallpaper.loaders.GalleryLoader;
+import ru.neosvet.wallpaper.ui.Tip;
 import ru.neosvet.wallpaper.utils.Lib;
 import ru.neosvet.wallpaper.utils.LoaderMaster;
 import ru.neosvet.wallpaper.utils.Settings;
@@ -45,8 +45,8 @@ public class MainActivity extends LoaderMaster
     private String site, tag = null, catigory = null;// "/tags/helga+lovekaty/";
     private DrawerLayout drawer;
     private View alpha_bg, menuImport;
-    private ListView lvSections;
-    private List<String> lSections = new ArrayList<String>();
+    private ListView lvCategories;
+    private List<String> lCategory = new ArrayList<String>();
     private Tip tip;
     private RecyclerView rvGallery, rvPages;
     private ProgressBar progressBar;
@@ -89,8 +89,8 @@ public class MainActivity extends LoaderMaster
                     case R.id.nav_main:
                         if (!unTag()) changeRep(DBHelper.LIST);
                         break;
-                    case R.id.nav_sections:
-                        lvSections.setVisibility(View.VISIBLE);
+                    case R.id.nav_categories:
+                        lvCategories.setVisibility(View.VISIBLE);
                         alpha_bg.setVisibility(View.VISIBLE);
                         break;
                     case R.id.nav_favorite:
@@ -153,23 +153,23 @@ public class MainActivity extends LoaderMaster
         menuImport = findViewById(R.id.menuImport);
         rvGallery = (RecyclerView) findViewById(R.id.rvGallery);
         rvPages = (RecyclerView) findViewById(R.id.rvPages);
-        lvSections = (ListView) findViewById(R.id.lvSections);
+        lvCategories = (ListView) findViewById(R.id.lvCategories);
         tip = new Tip(MainActivity.this, findViewById(R.id.tvToast));
 
-        lvSections.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        lvCategories.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                tag = lSections.get(i);
+                tag = lCategory.get(i);
                 catigory = adCategory.getItem(i);
                 loadPage(1);
-                lvSections.setVisibility(View.GONE);
+                lvCategories.setVisibility(View.GONE);
                 alpha_bg.setVisibility(View.GONE);
             }
         });
         alpha_bg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                lvSections.setVisibility(View.GONE);
+                lvCategories.setVisibility(View.GONE);
                 menuImport.setVisibility(View.GONE);
                 alpha_bg.setVisibility(View.GONE);
             }
@@ -206,7 +206,7 @@ public class MainActivity extends LoaderMaster
             count = state.getInt(COUNT);
             tag = state.getString(Lib.TAG);
             changeRep(state.getString(Lib.NAME_REP));
-            initSections();
+            initCategories();
         }
     }
 
@@ -236,8 +236,8 @@ public class MainActivity extends LoaderMaster
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if (lvSections.getVisibility() == View.VISIBLE) {
-                lvSections.setVisibility(View.GONE);
+            if (lvCategories.getVisibility() == View.VISIBLE) {
+                lvCategories.setVisibility(View.GONE);
                 alpha_bg.setVisibility(View.GONE);
                 return;
             }
@@ -323,18 +323,18 @@ public class MainActivity extends LoaderMaster
             return;
         }
         if (count == GalleryLoader.FINISH_CATEGORIES) {
-            initSections();
+            initCategories();
             return;
         }
         this.count = count;
         if (suc) {
             adGallery = new GalleryAdapter(MainActivity.this, DBHelper.LIST);
             initGallery();
-            initSections();
+            initCategories();
         }
     }
 
-    private void initSections() {
+    private void initCategories() {
         try {
             File f = new File(getFilesDir() + Lib.CATEGORIES);
             if (!f.exists()) return;
@@ -342,11 +342,11 @@ public class MainActivity extends LoaderMaster
             BufferedReader br = new BufferedReader(new FileReader(f));
             String s;
             while ((s = br.readLine()) != null) {
-                lSections.add(s);
+                lCategory.add(s);
                 adCategory.add(br.readLine());
             }
             br.close();
-            lvSections.setAdapter(adCategory);
+            lvCategories.setAdapter(adCategory);
         } catch (Exception e) {
             e.printStackTrace();
         }

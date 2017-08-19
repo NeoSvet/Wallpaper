@@ -76,7 +76,7 @@
     </LinearLayout>
 
     <ListView
-        android:id="@+id/lvSections"
+        android:id="@+id/lvCategories"
         android:layout_width="200dp"
         android:layout_height="match_parent"
         android:layout_marginBottom="50dp"
