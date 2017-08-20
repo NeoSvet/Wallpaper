@@ -116,17 +116,16 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
             int u, i = line.indexOf("root-menu__flex");
             i = line.indexOf("href", i) + 6;
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
-            while (i > 5) {
+            while (line.indexOf("src", i) > 0) {
                 u = line.indexOf("\"", i);
-                //https://ero.mota.ru/categories/view/name/erotica
+                if (i == line.indexOf("http", i))
+                    break;
                 bw.write(line.substring(i, u)); // url
                 bw.newLine();
-                if (line.indexOf("src", i) > 0) {
-                    i = line.indexOf("src", u) + 5;
-                    u = line.indexOf("\"", i);
-                    bw.write(line.substring(i, u)); // icon
-                    bw.newLine();
-                }
+                i = line.indexOf("src", u) + 5;
+                u = line.indexOf("\"", i);
+                bw.write(line.substring(i, u)); // icon
+                bw.newLine();
                 i = line.indexOf("span", u) + 5;
                 u = line.indexOf("<", i);
                 bw.write(line.substring(i, u)); // name
@@ -148,13 +147,14 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
             i = line.indexOf("\"element");
             i = line.indexOf("href", i) + 6;
             int end = line.lastIndexOf("deskription");
-            while (i < end) {
+            while (i < end && i > 5) {
                 u = line.indexOf("\"", i);
                 repository.addUrl(line.substring(i, u)); // url
                 i = line.indexOf("src", u) + 5;
                 u = line.indexOf("\"", i);
                 repository.addMini(line.substring(i, u)); // mini
                 i = line.indexOf("<li>", u);
+                if (i == -1) break;
                 i = line.indexOf("href", i) + 6;
                 if (i == 5) { //skip ad block
                     br.readLine();
@@ -162,9 +162,9 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
                     if (line.contains("Yandex")) {
                         while (!line.contains("<li>"))
                             line = br.readLine();
-                        end = line.lastIndexOf("deskription");
-                        i = line.indexOf("href", i) + 6;
                     }
+                    end = line.lastIndexOf("deskription");
+                    i = line.indexOf("href", i) + 6;
                 }
             }
             //count pages:
