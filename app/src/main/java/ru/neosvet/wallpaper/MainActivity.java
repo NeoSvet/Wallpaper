@@ -253,8 +253,9 @@ public class MainActivity extends LoaderMaster
             if (unTag()) return;
             try {
                 File d = new File(Lib.getFolder() + Lib.FOLDER);
-                for (File f : d.listFiles())
-                    f.delete();
+                if (d.listFiles() != null)
+                    for (File f : d.listFiles())
+                        f.delete();
                 d.delete();
             } catch (Exception e) {
                 e.printStackTrace();
