@@ -9,7 +9,7 @@
 
     <EditText
         android:id="@+id/etSite"
-        android:layout_width="200dp"
+        android:layout_width="@dimen/def_width"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:background="@drawable/field"
@@ -25,14 +25,14 @@
 
     <Spinner
         android:id="@+id/spStartOpen"
-        android:layout_width="200dp"
+        android:layout_width="@dimen/def_width"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:background="@drawable/field" />
 
     <Spinner
         android:id="@+id/spViewObject"
-        android:layout_width="200dp"
+        android:layout_width="@dimen/def_width"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:background="@drawable/field" />
@@ -45,13 +45,13 @@
 
     <SeekBar
         android:id="@+id/sbSlideShow"
-        android:layout_width="300dp"
+        android:layout_width="@dimen/def_width"
         android:layout_height="wrap_content"
         android:max="19" />
 
     <TextView
         android:id="@+id/tvSlideShow"
-        android:layout_width="300dp"
+        android:layout_width="@dimen/def_width"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:textSize="16sp" />
