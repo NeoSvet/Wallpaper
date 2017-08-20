@@ -7,6 +7,12 @@
     android:padding="20dp"
     tools:context="ru.neosvet.wallpaper.SettingsActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/site"
+        android:textSize="18sp" />
+
     <EditText
         android:id="@+id/etSite"
         android:layout_width="@dimen/def_width"
@@ -29,6 +35,12 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:background="@drawable/field" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/object_for_view"
+        android:textSize="18sp" />
 
     <Spinner
         android:id="@+id/spViewObject"
