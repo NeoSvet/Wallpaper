@@ -96,7 +96,7 @@ public class GalleryLoader extends IntentService implements LoaderMaster.IServic
             else if (tag.contains("/"))  //categories
                 url = site + tag + "/page/" + page + "/";
             else //tag
-                url = site + "/tags" + tag.replace(" ", "+") + "/page/" + page + "/";
+                url = site + "/tags/" + tag.replace(" ", "+") + "/page/" + page + "/";
             Request request = new Request.Builder().url(url).build();
             Response response = client.newCall(request).execute();
 //            InputStream in = new BufferedInputStream(response.body().byteStream());
