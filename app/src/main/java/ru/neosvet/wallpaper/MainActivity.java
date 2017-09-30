@@ -32,9 +32,8 @@ import ru.neosvet.wallpaper.adapters.ListAdapter;
 import ru.neosvet.wallpaper.adapters.PagesAdapter;
 import ru.neosvet.wallpaper.database.DBHelper;
 import ru.neosvet.wallpaper.database.GalleryRepository;
-import ru.neosvet.wallpaper.loaders.GalleryLoader;
-import ru.neosvet.wallpaper.loaders.GalleryLoaderMotaRu;
 import ru.neosvet.wallpaper.ui.Tip;
+import ru.neosvet.wallpaper.utils.GalleryService;
 import ru.neosvet.wallpaper.utils.Lib;
 import ru.neosvet.wallpaper.utils.LoaderMaster;
 import ru.neosvet.wallpaper.utils.Settings;
@@ -69,10 +68,7 @@ public class MainActivity extends LoaderMaster
         File d = new File(Lib.getFolder() + Lib.FOLDER);
         if (!d.exists()) d.mkdir();
 
-        if (site.contains(Lib.MOTARU))
-            intSrv = new Intent(MainActivity.this, GalleryLoaderMotaRu.class);
-        else
-            intSrv = new Intent(MainActivity.this, GalleryLoader.class);
+        intSrv = new Intent(MainActivity.this, GalleryService.class);
         restoreActivityState(savedInstanceState);
     }
 
@@ -276,8 +272,8 @@ public class MainActivity extends LoaderMaster
             GalleryRepository fav = new GalleryRepository(MainActivity.this, DBHelper.FAVORITE);
             String s;
             while ((s = br.readLine()) != null) {
-                fav.addUrl(getWithoutSite(s));
-                fav.addMini(getWithoutSite(br.readLine()));
+                fav.addUrl(s);
+                fav.addMini(br.readLine());
             }
             br.close();
             fav.save(REPLACE);
@@ -286,12 +282,6 @@ public class MainActivity extends LoaderMaster
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private String getWithoutSite(String s) {
-        if (s.contains(site))
-            return s.substring(site.length());
-        return s;
     }
 
     private void changeRep(String name) {
@@ -322,13 +312,13 @@ public class MainActivity extends LoaderMaster
     public void onPost(boolean suc, int count) {
         finishLoader();
         progressBar.setVisibility(View.GONE);
-        if (count == GalleryLoader.FINISH_ERROR)
+        if (count == GalleryService.FINISH_ERROR)
             return;
-        if (count == GalleryLoader.FINISH_MINI) {
+        if (count == GalleryService.FINISH_MINI) {
             adGallery.update();
             return;
         }
-        if (count == GalleryLoader.FINISH_CATEGORIES) {
+        if (count == GalleryService.FINISH_CATEGORIES) {
             initCategories();
             return;
         }
@@ -410,6 +400,8 @@ public class MainActivity extends LoaderMaster
         Intent intent = new Intent(MainActivity.this, ImageActivity.class);
         intent.putExtra(Lib.SORT, adGallery.isDESC());
         intent.putExtra(DBHelper.LIST, adGallery.getName());
+        if (!url.contains(":"))
+            url = site + url;
         intent.putExtra(DBHelper.URL, url);
         startActivityForResult(intent, 0);
     }

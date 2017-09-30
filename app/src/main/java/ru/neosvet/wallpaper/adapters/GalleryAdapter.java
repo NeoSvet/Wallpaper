@@ -63,12 +63,16 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
             holder.image.setImageResource(R.drawable.load_image);
             act.loadMini(repository.getUrl(position));
         } else {
-            if (site == null) {
-                Settings settings = new Settings(act);
-                site = settings.getSite();
+            String url = repository.getMini(position);
+            if (!url.contains(":")) {
+                if (site == null) {
+                    Settings settings = new Settings(act);
+                    site = settings.getSite();
+                }
+                url = site + url;
             }
             Picasso.with(act)
-                    .load(site + repository.getMini(position))
+                    .load(url)
                     .placeholder(R.drawable.load_image)
                     .error(R.drawable.no_image)
                     .into(holder.image);

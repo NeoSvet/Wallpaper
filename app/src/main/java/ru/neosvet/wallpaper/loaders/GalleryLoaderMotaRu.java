@@ -1,8 +1,6 @@
 package ru.neosvet.wallpaper.loaders;
 
-import android.app.IntentService;
-import android.content.Intent;
-import android.os.IBinder;
+import android.content.Context;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -13,79 +11,31 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.net.URLEncoder;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import ru.neosvet.wallpaper.MainActivity;
 import ru.neosvet.wallpaper.database.DBHelper;
 import ru.neosvet.wallpaper.database.GalleryRepository;
+import ru.neosvet.wallpaper.utils.GalleryService;
 import ru.neosvet.wallpaper.utils.Lib;
-import ru.neosvet.wallpaper.utils.LoaderMaster;
-import ru.neosvet.wallpaper.utils.Settings;
+
+import static ru.neosvet.wallpaper.utils.GalleryService.*;
 
 /**
  * Created by NeoSvet on 19.08.2017.
  */
 
-public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.IService {
-    private final byte WORK = 0, SAVING = 1, FINISH = 2, ERROR = 3;
-    public static final int FINISH_ERROR = -1, FINISH_MINI = -2, FINISH_CATEGORIES = -3;
-    private byte status = WORK;
-    private final IBinder binder = new LoaderMaster.MyBinder(GalleryLoaderMotaRu.this);
-    private int count = 0;
-    private GalleryRepository repository;
-    private List<String> urls = new LinkedList<String>();
-    private boolean boolThread = false;
-    private MainActivity act;
-    private String site = null;
+public class GalleryLoaderMotaRu extends GalleryService.Loader {
+    private Context context;
+    private String site;
 
-    public void setAct(LoaderMaster act) {
-        this.act = (MainActivity) act;
-    }
-
-    public GalleryLoaderMotaRu() {
-        super("GalleryLoader");
+    public GalleryLoaderMotaRu(Context context, String site) {
+        this.context = context;
+        this.site = site;
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return binder;
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        if (site == null) {
-            Settings settings = new Settings(GalleryLoaderMotaRu.this);
-            site = settings.getSite();
-        }
-        if (intent.hasExtra(DBHelper.URL)) { // load mini
-            status = WORK;
-            urls.add(intent.getStringExtra(DBHelper.URL));
-            if (repository == null)
-                repository = new GalleryRepository(GalleryLoaderMotaRu.this, intent.getStringExtra(DBHelper.LIST));
-            if (!boolThread)
-                startThread();
-            status = FINISH;
-            return;
-        }
-
-        final boolean suc = download(intent.getIntExtra(Lib.PAGE, 1), intent.getStringExtra(Lib.TAG));
-        if (act != null) {
-            act.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    act.onPost(suc, count);
-                }
-            });
-        }
-        if (!boolThread)
-            stopSelf();
-    }
-
-    private boolean download(int page, String tag) {
+    public boolean download(int page, String tag) {
         String line;
-        File f = new File(getFilesDir() + Lib.CATEGORIES);
+        File f = new File(context.getFilesDir() + Lib.CATEGORIES);
         try {
             //start:
             String url;
@@ -141,7 +91,7 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
                 return true;
             }
             //gallery:
-            repository = new GalleryRepository(GalleryLoaderMotaRu.this, DBHelper.LIST);
+            GalleryRepository repository = new GalleryRepository(context, DBHelper.LIST);
             while (!line.contains("element"))
                 line = br.readLine();
             i = line.indexOf("\"element");
@@ -179,8 +129,8 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
             status = SAVING;
             repository.save(true);
             status = FINISH;
-            if (urls.size() > 0 && !boolThread)
-                startThread();
+//            if (urls.size() > 0 && !boolThread)
+//                startThread();
         } catch (Exception e) {
             if (f.exists())
                 f.delete();
@@ -192,46 +142,8 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
         return true;
     }
 
-    private void startThread() {
-        boolThread = true;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String mini;
-                    while (urls.size() > 0 && status != ERROR) {
-                        mini = getMini(urls.get(0));
-                        while (status == SAVING) {
-                            Thread.sleep(200);
-                        }
-                        if (status == FINISH) {
-                            repository.updateMini(urls.get(0), mini);
-                            if (act != null)
-                                act.updateGallery();
-                        } else // WORK
-                            repository.addMini(urls.get(0), mini);
-                        urls.remove(0);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                boolThread = false;
-                if (status == FINISH) {
-                    if (act != null) {
-                        act.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                act.onPost(true, FINISH_MINI);
-                                stopSelf();
-                            }
-                        });
-                    }
-                }
-            }
-        }).start();
-    }
-
-    private String getMini(String url_image) {
+    @Override
+    public String getMini(String url_image) {
         try {
             final String link = site + "/wallpapers/get/id" +
                     url_image.substring(url_image.lastIndexOf("/")) + "/resolution/320x240";
@@ -246,10 +158,15 @@ public class GalleryLoaderMotaRu extends IntentService implements LoaderMaster.I
                 line = br.readLine();
             br.close();
             line = line.substring(line.indexOf("src", line.indexOf("full-img")) + 5);
-            return line.substring(0, line.indexOf("\""));
+            return site + line.substring(0, line.indexOf("\""));
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public String getSite() {
+        return site;
     }
 }

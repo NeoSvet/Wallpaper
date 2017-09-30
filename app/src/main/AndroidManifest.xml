@@ -28,21 +28,13 @@
         <activity android:name=".SettingsActivity"></activity>
 
         <service
-            android:name=".loaders.GalleryLoader"
+            android:name=".utils.GalleryService"
             android:icon="@mipmap/ic_launcher"
-            android:label="GalleryLoader" />
+            android:label="GalleryService" />
         <service
-            android:name=".loaders.ImageLoader"
+            android:name=".utils.ImageService"
             android:icon="@mipmap/ic_launcher"
-            android:label="ImageLoader" />
-        <service
-            android:name=".loaders.GalleryLoaderMotaRu"
-            android:icon="@mipmap/ic_launcher"
-            android:label="GalleryLoader" />
-        <service
-            android:name=".loaders.ImageLoaderMotaRu"
-            android:icon="@mipmap/ic_launcher"
-            android:label="ImageLoader" />
+            android:label="ImageService" />
     </application>
 
 </manifest>

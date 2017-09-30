@@ -1,8 +1,6 @@
 package ru.neosvet.wallpaper.loaders;
 
-import android.app.IntentService;
-import android.content.Intent;
-import android.os.IBinder;
+import android.content.Context;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -12,79 +10,30 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import ru.neosvet.wallpaper.MainActivity;
 import ru.neosvet.wallpaper.database.DBHelper;
 import ru.neosvet.wallpaper.database.GalleryRepository;
+import ru.neosvet.wallpaper.utils.GalleryService;
 import ru.neosvet.wallpaper.utils.Lib;
-import ru.neosvet.wallpaper.utils.LoaderMaster;
-import ru.neosvet.wallpaper.utils.Settings;
 
 /**
  * Created by NeoSvet on 06.08.2017.
  */
 
-public class GalleryLoader extends IntentService implements LoaderMaster.IService {
-    private final byte WORK = 0, SAVING = 1, FINISH = 2, ERROR = 3;
-    public static final int FINISH_ERROR = -1, FINISH_MINI = -2, FINISH_CATEGORIES = -3;
-    private byte status = WORK;
-    private final IBinder binder = new LoaderMaster.MyBinder(GalleryLoader.this);
-    private int count = 0;
-    private GalleryRepository repository;
-    private List<String> urls = new LinkedList<String>();
-    private boolean boolThread = false;
-    private MainActivity act;
-    private String site = null;
+public class GalleryLoader extends GalleryService.Loader {
+    private Context context;
+    private String site;
 
-    public void setAct(LoaderMaster act) {
-        this.act = (MainActivity) act;
-    }
-
-    public GalleryLoader() {
-        super("GalleryLoader");
+    public GalleryLoader(Context context, String site) {
+        this.context = context;
+        this.site = site;
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return binder;
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        if (site == null) {
-            Settings settings = new Settings(GalleryLoader.this);
-            site = settings.getSite();
-        }
-        if (intent.hasExtra(DBHelper.URL)) { // load mini
-            status = WORK;
-            urls.add(intent.getStringExtra(DBHelper.URL));
-            if (repository == null)
-                repository = new GalleryRepository(GalleryLoader.this, intent.getStringExtra(DBHelper.LIST));
-            if (!boolThread)
-                startThread();
-            status = FINISH;
-            return;
-        }
-
-        final boolean suc = download(intent.getIntExtra(Lib.PAGE, 1), intent.getStringExtra(Lib.TAG));
-        if (act != null) {
-            act.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    act.onPost(suc, count);
-                }
-            });
-        }
-        if (!boolThread)
-            stopSelf();
-    }
-
-    private boolean download(int page, String tag) {
+    public boolean download(int page, String tag) {
         String line;
-        File f = new File(getFilesDir() + Lib.CATEGORIES);
+        File f = new File(context.getFilesDir() + Lib.CATEGORIES);
         try {
             //start:
             OkHttpClient client = new OkHttpClient();
@@ -124,13 +73,13 @@ public class GalleryLoader extends IntentService implements LoaderMaster.IServic
             bw.close();
             if (page == 0) {
                 br.close();
-                status = FINISH;
-                count = FINISH_CATEGORIES;
+                status = GalleryService.FINISH;
+                count = GalleryService.FINISH_CATEGORIES;
                 return true;
             }
             //gallery:
             String url_image;
-            repository = new GalleryRepository(GalleryLoader.this, DBHelper.LIST);
+            GalleryRepository repository = new GalleryRepository(context, DBHelper.LIST);
             while (!line.contains("col-md-4"))
                 line = br.readLine();
             while (!line.contains("<nav>") && !line.contains("<noindex>")) {
@@ -166,68 +115,29 @@ public class GalleryLoader extends IntentService implements LoaderMaster.IServic
             }
             //finish:
             br.close();
-            status = SAVING;
+            status = GalleryService.SAVING;
             repository.save(true);
-            status = FINISH;
-            if (urls.size() > 0 && !boolThread)
-                startThread();
+            status = GalleryService.FINISH;
+//            if (urls.size() > 0 && !boolThread)
+//                startThread();
         } catch (Exception e) {
             if (f.exists())
                 f.delete();
-            status = ERROR;
-            count = FINISH_ERROR;
+            status = GalleryService.ERROR;
+            count = GalleryService.FINISH_ERROR;
             e.printStackTrace();
             return false;
         }
         return true;
     }
 
-    private void startThread() {
-        boolThread = true;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String mini;
-                    while (urls.size() > 0 && status != ERROR) {
-                        mini = getMini(urls.get(0));
-                        while (status == SAVING) {
-                            Thread.sleep(200);
-                        }
-                        if (status == FINISH) {
-                            repository.updateMini(urls.get(0), mini);
-                            if (act != null)
-                                act.updateGallery();
-                        } else // WORK
-                            repository.addMini(urls.get(0), mini);
-                        urls.remove(0);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                boolThread = false;
-                if (status == FINISH) {
-                    if (act != null) {
-                        act.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                act.onPost(true, FINISH_MINI);
-                                stopSelf();
-                            }
-                        });
-                    }
-                }
-            }
-        }).start();
-    }
-
-    private String getMini(String url_image) {
+    @Override
+    public String getMini(String url_image) {
         try {
-            final String link = site + url_image;
             OkHttpClient client = new OkHttpClient();
             client.setConnectTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
             client.setReadTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
-            Request request = new Request.Builder().url(link).build();
+            Request request = new Request.Builder().url(url_image).build();
             Response response = client.newCall(request).execute();
             String line = response.body().string();
             line = line.substring(line.indexOf("ges/") + 3);
@@ -235,10 +145,15 @@ public class GalleryLoader extends IntentService implements LoaderMaster.IServic
             line = line.substring(line.indexOf("_") + 1);
             line = line.substring(0, line.indexOf("\"") + 1);
             s = s + line;
-            return "/mini" + s.substring(0, s.length() - 1);
+            return site + "/mini" + s.substring(0, s.length() - 1);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public String getSite() {
+        return site;
     }
 }

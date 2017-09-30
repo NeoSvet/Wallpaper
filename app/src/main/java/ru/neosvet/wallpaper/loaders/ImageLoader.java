@@ -1,9 +1,5 @@
 package ru.neosvet.wallpaper.loaders;
 
-import android.app.IntentService;
-import android.content.Intent;
-import android.os.IBinder;
-
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -11,102 +7,41 @@ import com.squareup.okhttp.Response;
 import java.io.BufferedReader;
 import java.util.concurrent.TimeUnit;
 
-import ru.neosvet.wallpaper.ImageActivity;
-import ru.neosvet.wallpaper.R;
-import ru.neosvet.wallpaper.database.DBHelper;
+import ru.neosvet.wallpaper.utils.ImageService;
 import ru.neosvet.wallpaper.utils.Lib;
-import ru.neosvet.wallpaper.utils.LoaderMaster;
-import ru.neosvet.wallpaper.utils.Settings;
 
 /**
  * Created by NeoSvet on 06.08.2017.
  */
 
-public class ImageLoader extends IntentService implements LoaderMaster.IService {
-    private final IBinder binder = new LoaderMaster.MyBinder(ImageLoader.this);
-    private String site = null, link, img;
-    private StringBuilder tags, carousel;
-    private ImageActivity act;
+public class ImageLoader extends ImageService.Loader {
+    private String site = null;
 
-    public void setAct(LoaderMaster act) {
-        this.act = (ImageActivity) act;
-    }
-
-    public ImageLoader() {
-        super("ImageLoader");
+    public ImageLoader(String site) {
+        this.site = site;
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return binder;
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        if (site == null) {
-            Settings settings = new Settings(ImageLoader.this);
-            site = settings.getSite();
-        }
-        if (intent.hasExtra(DBHelper.CARAROUSEL)) {
-            downloadWithCarousel(intent.getStringExtra(DBHelper.CARAROUSEL),
-                    intent.getStringExtra(DBHelper.URL));
-        } else {
-            download(intent.getStringExtra(DBHelper.URL));
-        }
-        stopSelf();
-    }
-
-    private void download(String url) {
-        final boolean suc = load(url, false);
-        if (act != null) {
-            act.finishLoader();
-            act.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    String[] t = new String[]{};
-                    String[] c = new String[]{};
-                    if (suc) {
-                        tags.insert(0, act.getResources().getString(R.string.tags) + ":@");
-                        t = tags.toString().split("@");
-                        c = carousel.toString().split("@");
-                    }
-                    act.onPost(suc, link, t, c);
-                }
-            });
-        }
-    }
-
-    private void downloadWithCarousel(String car_url, String url) {
-        final boolean suc = load(car_url, true);
-        if (act != null) {
-            act.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    String[] c = new String[]{};
-                    if (suc)
-                        c = carousel.toString().split("@");
-                    act.onPost(c);
-                }
-            });
-            download(url);
-        }
-    }
-
-    private boolean load(String url, boolean onlyCarousel) {
+    public String[] load(String url, boolean onlyCarousel) {
         try {
-            link = url;
+            StringBuilder tags = new StringBuilder();
+            if (url.contains(":")) {
+                site = url.substring(0, url.indexOf("/", 10));
+            } else
+                url = site + url;
+            String link = url;
             OkHttpClient client = new OkHttpClient();
             client.setConnectTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
             client.setReadTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
-            Request request = new Request.Builder().url(site + link).build();
+            Request request = new Request.Builder().url(link).build();
             Response response = client.newCall(request).execute();
             BufferedReader br = new BufferedReader(response.body().charStream(), 1000);
             String line = br.readLine();
             if (!onlyCarousel) {
                 while (!line.contains("/large"))
                     line = br.readLine();
-                img = line.substring(line.indexOf("src") + 5);
-                img = img.substring(0, img.indexOf("\"")).replace("large", "mini");
+                //img = line.substring(line.indexOf("src") + 5);
+                //img = img.substring(0, img.indexOf("\"")).replace("large", "mini");
                 line = br.readLine();
                 while (!line.contains("href"))
                     line = br.readLine();
@@ -121,7 +56,7 @@ public class ImageLoader extends IntentService implements LoaderMaster.IService 
                     line = br.readLine();
                 line = br.readLine();
                 int i = line.indexOf("<a");
-                tags = new StringBuilder();
+
                 while (i > 0) {
                     tags.append(line.substring(line.indexOf(">", i) + 1,
                             line.indexOf("</", i)));
@@ -133,7 +68,7 @@ public class ImageLoader extends IntentService implements LoaderMaster.IService 
             //load carousel:
             while (!line.contains("scrollbar"))
                 line = br.readLine();
-            carousel = new StringBuilder();
+            StringBuilder carousel = new StringBuilder();
             if (!line.contains("iframe")) {
                 line = br.readLine();
                 while (!line.contains("</ul>")) {
@@ -152,22 +87,21 @@ public class ImageLoader extends IntentService implements LoaderMaster.IService 
             }
             br.close();
 
-            if (onlyCarousel)
-                return true;
-
-            response = client.newCall(request).execute();
-            br = new BufferedReader(response.body().charStream(), 1000);
-            while (!line.contains("photo\""))
+            if (!onlyCarousel) {
+                response = client.newCall(request).execute();
+                br = new BufferedReader(response.body().charStream(), 1000);
+                while (!line.contains("photo\""))
+                    line = br.readLine();
                 line = br.readLine();
-            line = br.readLine();
-            line = line.substring(line.indexOf("src") + 5);
-            link = line.substring(0, line.indexOf("\""));
-            br.close();
+                line = line.substring(line.indexOf("src") + 5);
+                link = line.substring(0, line.indexOf("\""));
+                br.close();
+            }
 
-            return true;
+            return new String[]{link, tags.toString(), carousel.toString()};
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 }
