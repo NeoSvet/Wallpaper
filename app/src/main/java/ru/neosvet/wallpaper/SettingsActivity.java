@@ -30,6 +30,7 @@ public class SettingsActivity extends AppCompatActivity {
     private SeekBar sbSlideShow;
     private TextView tvSlideShow;
     private Settings settings;
+    private Tip tip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,8 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.settings_activity);
 
         settings = new Settings(SettingsActivity.this);
+        tip = new Tip(SettingsActivity.this, findViewById(R.id.tvToast));
+
         initSite();
         initViewObject();
         initSlideshowTimer();
@@ -105,6 +108,14 @@ public class SettingsActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        findViewById(R.id.bClearSites).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                f.delete();
+                tip.show();
+            }
+        });
     }
 
     private void initViewObject() {
@@ -154,7 +165,6 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 GalleryRepository recent = new GalleryRepository(SettingsActivity.this, DBHelper.RECENT);
                 recent.save(true);
-                Tip tip = new Tip(SettingsActivity.this, findViewById(R.id.tvToast));
                 tip.show();
             }
         });

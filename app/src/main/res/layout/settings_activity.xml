@@ -21,13 +21,25 @@
             android:id="@+id/etSite"
             android:layout_width="@dimen/def_width"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="5dp"
             android:background="@drawable/field"
             android:imeOptions="actionDone"
             android:inputType="textUri"
             android:padding="10dp"
             android:textColor="@android:color/white"
             android:textSize="22sp" />
+
+        <Button
+            android:id="@+id/bClearSites"
+            android:layout_width="@dimen/def_width"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/field"
+            android:padding="3dp"
+            android:text="@string/clear_sites"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
 
         <TextView
             android:layout_width="wrap_content"
