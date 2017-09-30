@@ -218,6 +218,8 @@ public class MainActivity extends LoaderMaster
     protected void onSaveInstanceState(Bundle outState) {
         if (adGallery != null)
             outState.putString(Lib.NAME_REP, adGallery.getName());
+        else
+            outState.putString(Lib.NAME_REP, DBHelper.LIST);
         outState.putString(Lib.CATEGORIES, category);
         outState.putInt(Lib.PAGE, page);
         outState.putInt(COUNT, count);
