@@ -1,9 +1,11 @@
 package ru.neosvet.wallpaper;
 
+import android.app.Service;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.SeekBar;
@@ -31,6 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView tvSlideShow;
     private Settings settings;
     private Tip tip;
+    private InputMethodManager im;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +42,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         settings = new Settings(SettingsActivity.this);
         tip = new Tip(SettingsActivity.this, findViewById(R.id.tvToast));
+        im = (InputMethodManager) getSystemService(Service.INPUT_METHOD_SERVICE);
 
         initSite();
         initViewObject();
@@ -112,6 +116,7 @@ public class SettingsActivity extends AppCompatActivity {
         findViewById(R.id.bClearSites).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                im.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
                 f.delete();
                 tip.show();
             }
