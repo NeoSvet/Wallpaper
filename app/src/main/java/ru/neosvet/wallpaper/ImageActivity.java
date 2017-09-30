@@ -319,7 +319,7 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
             repository.load(getIntent().getBooleanExtra(Lib.SORT, false));
         for (int i = 0; i < repository.getCount(); i++) {
             u = repository.getUrl(i);
-            if (url.equals(u)) {
+            if (url.contains(u)) {
                 if (next) {
                     i++;
                     if (i < repository.getCount()) {
