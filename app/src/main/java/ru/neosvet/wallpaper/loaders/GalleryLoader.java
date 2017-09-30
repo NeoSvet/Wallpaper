@@ -143,7 +143,7 @@ public class GalleryLoader extends IntentService implements LoaderMaster.IServic
                     line = br.readLine();
                     if (line.contains("holder.js")) //for tag
                         line = br.readLine();
-                    line = line.substring(line.indexOf(site) + site.length(), line.length() - 1);
+                    line = line.substring(line.indexOf("/", line.indexOf(".")), line.length() - 1);
                     repository.addMini(line);
                 }
             }
