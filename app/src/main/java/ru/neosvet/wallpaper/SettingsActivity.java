@@ -2,12 +2,16 @@ package ru.neosvet.wallpaper;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import ru.neosvet.wallpaper.database.DBHelper;
+import ru.neosvet.wallpaper.database.GalleryRepository;
+import ru.neosvet.wallpaper.ui.Tip;
 import ru.neosvet.wallpaper.utils.Settings;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -27,6 +31,7 @@ public class SettingsActivity extends AppCompatActivity {
         initViewObject();
         initSlideshowTimer();
         initStartOpen();
+        initClearRecent();
     }
 
     @Override
@@ -83,5 +88,17 @@ public class SettingsActivity extends AppCompatActivity {
                 getResources().getString(R.string.main), getResources().getString(R.string.favorite)});
         spStartOpen.setAdapter(adapter);
         spStartOpen.setSelection(settings.getStartOpen());
+    }
+
+    private void initClearRecent() {
+        findViewById(R.id.bClearRecent).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                GalleryRepository recent = new GalleryRepository(SettingsActivity.this, DBHelper.RECENT);
+                recent.save(true);
+                Tip tip = new Tip(SettingsActivity.this, findViewById(R.id.tvToast));
+                tip.show();
+            }
+        });
     }
 }

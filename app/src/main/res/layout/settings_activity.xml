@@ -1,70 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="20dp"
     tools:context="ru.neosvet.wallpaper.SettingsActivity">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/site"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/etSite"
+            android:layout_width="@dimen/def_width"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/field"
+            android:padding="10dp"
+            android:textColor="@android:color/white"
+            android:textSize="22sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/start_open"
+            android:textSize="18sp" />
+
+        <Spinner
+            android:id="@+id/spStartOpen"
+            android:layout_width="@dimen/def_width"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/field" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/object_for_view"
+            android:textSize="18sp" />
+
+        <Spinner
+            android:id="@+id/spViewObject"
+            android:layout_width="@dimen/def_width"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/field" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/slideshow_timer"
+            android:textSize="18sp" />
+
+        <SeekBar
+            android:id="@+id/sbSlideShow"
+            android:layout_width="@dimen/def_width"
+            android:layout_height="wrap_content"
+            android:max="29" />
+
+        <TextView
+            android:id="@+id/tvSlideShow"
+            android:layout_width="@dimen/def_width"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:gravity="center_horizontal"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/bClearRecent"
+            android:layout_width="@dimen/def_width"
+            android:layout_height="wrap_content"
+            android:background="@drawable/field"
+            android:padding="10dp"
+            android:text="@string/clear_recent"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
+    </LinearLayout>
+
     <TextView
+        android:id="@+id/tvToast"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/site"
-        android:textSize="18sp" />
-
-    <EditText
-        android:id="@+id/etSite"
-        android:layout_width="@dimen/def_width"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="80dp"
         android:background="@drawable/field"
         android:padding="10dp"
+        android:text="@string/ready"
         android:textColor="@android:color/white"
-        android:textSize="22sp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/start_open"
-        android:textSize="18sp" />
-
-    <Spinner
-        android:id="@+id/spStartOpen"
-        android:layout_width="@dimen/def_width"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/field" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/object_for_view"
-        android:textSize="18sp" />
-
-    <Spinner
-        android:id="@+id/spViewObject"
-        android:layout_width="@dimen/def_width"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/field" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/slideshow_timer"
-        android:textSize="18sp" />
-
-    <SeekBar
-        android:id="@+id/sbSlideShow"
-        android:layout_width="@dimen/def_width"
-        android:layout_height="wrap_content"
-        android:max="19" />
-
-    <TextView
-        android:id="@+id/tvSlideShow"
-        android:layout_width="@dimen/def_width"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:textSize="16sp" />
-</LinearLayout>
+        android:textSize="20sp"
+        android:visibility="gone" />
+</RelativeLayout>
