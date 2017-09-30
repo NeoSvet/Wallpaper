@@ -88,6 +88,20 @@
             android:textSize="22sp" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tvListEmpty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="80dp"
+        android:background="@drawable/field"
+        android:padding="10dp"
+        android:text="@string/list_empty"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:visibility="gone" />
+
     <ListView
         android:id="@+id/lvCategories"
         android:layout_width="@dimen/def_width"

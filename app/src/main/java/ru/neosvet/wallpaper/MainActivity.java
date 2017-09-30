@@ -44,7 +44,7 @@ public class MainActivity extends LoaderMaster
     private int page = 1, count = 0;
     private String site, tag = null, category = null;// "/tags/helga+lovekaty/";
     private DrawerLayout drawer;
-    private View alpha_bg, menuImport;
+    private View alpha_bg, menuImport, tvListEmpty;
     private ListView lvCategories;
     private List<String> lCategory = new ArrayList<String>();
     private Tip tip;
@@ -154,6 +154,7 @@ public class MainActivity extends LoaderMaster
         rvGallery = (RecyclerView) findViewById(R.id.rvGallery);
         rvPages = (RecyclerView) findViewById(R.id.rvPages);
         lvCategories = (ListView) findViewById(R.id.lvCategories);
+        tvListEmpty = findViewById(R.id.tvListEmpty);
         tip = new Tip(MainActivity.this, findViewById(R.id.tvToast));
 
         lvCategories.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -369,6 +370,13 @@ public class MainActivity extends LoaderMaster
         }
 
         rvGallery.setAdapter(adGallery);
+
+        if(adGallery.getItemCount() == 0) {
+            rvPages.setVisibility(View.GONE);
+            tvListEmpty.setVisibility(View.VISIBLE);
+            return;
+        } else
+            tvListEmpty.setVisibility(View.GONE);
 
         if (!adGallery.getName().equals(DBHelper.LIST)) {
             rvPages.setVisibility(View.GONE);
