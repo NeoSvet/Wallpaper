@@ -41,9 +41,10 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvCarousel"
         android:layout_width="match_parent"
-        android:layout_height="190dp"
+        android:layout_height="210dp"
         android:layout_alignParentBottom="true"
         android:background="#33000000"
+        android:paddingBottom="10dp"
         android:visibility="gone" />
 
     <TextView

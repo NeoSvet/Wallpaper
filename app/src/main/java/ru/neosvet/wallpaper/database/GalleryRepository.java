@@ -154,4 +154,8 @@ public class GalleryRepository {
         }
         save(true);
     }
+
+    public void clear() {
+        data.clear();
+    }
 }

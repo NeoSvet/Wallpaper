@@ -1,5 +1,6 @@
 package ru.neosvet.wallpaper.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,17 +9,18 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import ru.neosvet.wallpaper.MainActivity;
 import ru.neosvet.wallpaper.R;
 import ru.neosvet.wallpaper.database.DBHelper;
 import ru.neosvet.wallpaper.database.GalleryRepository;
 import ru.neosvet.wallpaper.utils.Lib;
+import ru.neosvet.wallpaper.utils.LoaderMini;
 import ru.neosvet.wallpaper.utils.Settings;
 
 /**
@@ -33,10 +35,11 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     private MainActivity act;
     private OnItemClickListener mListener;
     private GalleryRepository repository;
-    private boolean DESC = false;
+    private List<LoaderMini> loaders = new ArrayList<LoaderMini>();
+    private boolean DESC = false, boolNoAnim = false;
     private String site = null;
     private int lastPosition = -1;
-    private Animation animation;
+    private Animation animation, animationInvert;
 
     public GalleryAdapter(MainActivity activity, String name) {
         act = activity;
@@ -45,7 +48,12 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         if (!name.equals(DBHelper.LIST))
             DESC = !DESC;
         repository.load(DESC);
-        animation = AnimationUtils.loadAnimation(activity, R.anim.add_item);
+        setItemAnimation(activity, R.anim.add_item_d, R.anim.add_item_di);
+    }
+
+    public void setItemAnimation(Context context, int anim, int animInvert) {
+        animation = AnimationUtils.loadAnimation(context, anim);
+        animationInvert = AnimationUtils.loadAnimation(context, animInvert);
     }
 
     public String getName() {
@@ -76,11 +84,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                 }
                 url = site + url;
             }
-            Picasso.with(act)
-                    .load(url)
-                    .placeholder(R.drawable.load_image)
-                    .error(R.drawable.no_image)
-                    .into(holder.image);
+            loaders.add(new LoaderMini(act, url, holder.image));
         }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,7 +93,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
             }
         });
 
-        setAnimation(holder.itemView, position);
+        if (!boolNoAnim)
+            setAnimation(holder.itemView, position);
     }
 
     @Override
@@ -107,20 +112,26 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     }
 
     public void update() {
+        boolNoAnim = true;
         repository.load(DESC);
         GalleryAdapter.this.notifyDataSetChanged();
+        boolNoAnim = false;
     }
 
     public void reverse() {
+        boolNoAnim = true;
         DESC = !DESC;
         repository.load(DESC);
         GalleryAdapter.this.notifyDataSetChanged();
+        boolNoAnim = false;
     }
 
     public void mix() {
+        boolNoAnim = true;
         DESC = true;
         repository.mix();
         GalleryAdapter.this.notifyDataSetChanged();
+        boolNoAnim = false;
     }
 
     public boolean export() {
@@ -153,9 +164,17 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     }
 
     private void setAnimation(View viewToAnimate, int position) {
-        if (position > lastPosition) {
+        viewToAnimate.clearAnimation();
+        if (position > lastPosition)
             viewToAnimate.startAnimation(animation);
-            lastPosition = position;
-        }
+        else
+            viewToAnimate.startAnimation(animationInvert);
+        lastPosition = position;
+    }
+
+    public void clear() {
+        loaders.clear();
+        repository.clear();
+        GalleryAdapter.this.notifyDataSetChanged();
     }
 }

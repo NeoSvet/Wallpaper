@@ -119,7 +119,7 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
             rvCarousel.setAdapter(adCarousel);
             file = Lib.getFile(url);
             if (file.exists()) {
-                openImage(file.toString());
+                openImage();
                 TimerTask tTask = new TimerTask() {
                     @Override
                     public void run() {
@@ -185,7 +185,8 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
         startLoader();
     }
 
-    private void openImage(String path) {
+    private void openImage() {
+        String path = file.toString();
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         Bitmap bitmap = BitmapFactory.decodeFile(path, options);
@@ -369,7 +370,8 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
         try {
             FileOutputStream out = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
-            openImage(file.toString());
+            out.close();
+            openImage();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -407,7 +409,7 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
         this.tags = tags;
         if (suc) {
             if (file.exists()) {
-                openImage(file.toString());
+                openImage();
                 if (!boolSlideShow)
                     progressBar.setVisibility(View.GONE);
             } else {

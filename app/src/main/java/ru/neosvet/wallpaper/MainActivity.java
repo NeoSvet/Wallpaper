@@ -286,6 +286,7 @@ public class MainActivity extends LoaderMaster
     }
 
     private void changeRep(String name) {
+        if (adGallery != null) adGallery.clear();
         adGallery = new GalleryAdapter(MainActivity.this, name);
         if (name.equals(DBHelper.LIST)) {
             MainActivity.this.setTitle(getResources().getString(R.string.main));
@@ -325,6 +326,7 @@ public class MainActivity extends LoaderMaster
         }
         this.count = count;
         if (suc) {
+            if (adGallery != null) adGallery.clear();
             adGallery = new GalleryAdapter(MainActivity.this, DBHelper.LIST);
             initGallery();
             initCategories();
@@ -361,17 +363,20 @@ public class MainActivity extends LoaderMaster
                 GridLayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 2);
                 rvGallery.setLayoutManager(layoutManager);
             }
+            adGallery.setItemAnimation(MainActivity.this, R.anim.add_item_d, R.anim.add_item_di);
         } else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
             rvGallery.setLayoutManager(layoutManager);
+            adGallery.setItemAnimation(MainActivity.this, R.anim.add_item_h, R.anim.add_item_hi);
         } else {
             LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
             rvGallery.setLayoutManager(layoutManager);
+            adGallery.setItemAnimation(MainActivity.this, R.anim.add_item_v, R.anim.add_item_vi);
         }
 
         rvGallery.setAdapter(adGallery);
 
-        if(adGallery.getItemCount() == 0) {
+        if (adGallery.getItemCount() == 0) {
             rvPages.setVisibility(View.GONE);
             tvListEmpty.setVisibility(View.VISIBLE);
             return;
