@@ -4,6 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
@@ -33,6 +35,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     private GalleryRepository repository;
     private boolean DESC = false;
     private String site = null;
+    private int lastPosition = -1;
+    private Animation animation;
 
     public GalleryAdapter(MainActivity activity, String name) {
         act = activity;
@@ -41,6 +45,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         if (!name.equals(DBHelper.LIST))
             DESC = !DESC;
         repository.load(DESC);
+        animation = AnimationUtils.loadAnimation(activity, R.anim.add_item);
     }
 
     public String getName() {
@@ -83,6 +88,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                 mListener.onItemClick(repository.getUrl(position));
             }
         });
+
+        setAnimation(holder.itemView, position);
     }
 
     @Override
@@ -143,5 +150,12 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
             e.printStackTrace();
         }
         return false;
+    }
+
+    private void setAnimation(View viewToAnimate, int position) {
+        if (position > lastPosition) {
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
     }
 }
