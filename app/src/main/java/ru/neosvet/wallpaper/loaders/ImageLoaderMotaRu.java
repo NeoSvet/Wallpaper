@@ -27,11 +27,10 @@ public class ImageLoaderMotaRu extends ImageService.Loader {
             StringBuilder tags = new StringBuilder();
             if (!url.contains(":"))
                 url = site + url;
-            String link = url;
             OkHttpClient client = new OkHttpClient();
             client.setConnectTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
             client.setReadTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
-            Request request = new Request.Builder().url(link).build();
+            Request request = new Request.Builder().url(url).build();
             Response response = client.newCall(request).execute();
             BufferedReader br = new BufferedReader(response.body().charStream(), 1000);
             String line = br.readLine();
@@ -88,10 +87,10 @@ public class ImageLoaderMotaRu extends ImageService.Loader {
                     line = br.readLine();
                 br.close();
                 line = line.substring(line.indexOf("src", line.indexOf("full-img")) + 5);
-                link = site + line.substring(0, line.indexOf("\""));
+                url = site + line.substring(0, line.indexOf("\""));
             }
 
-            return new String[]{link, tags.toString(), carousel.toString()};
+            return new String[]{url, tags.toString(), carousel.toString()};
         } catch (Exception e) {
             e.printStackTrace();
             return null;

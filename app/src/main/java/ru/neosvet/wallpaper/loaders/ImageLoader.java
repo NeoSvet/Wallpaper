@@ -29,11 +29,10 @@ public class ImageLoader extends ImageService.Loader {
                 site = url.substring(0, url.indexOf("/", 10));
             } else
                 url = site + url;
-            String link = url;
             OkHttpClient client = new OkHttpClient();
             client.setConnectTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
             client.setReadTimeout(Lib.TIMEOUT, TimeUnit.SECONDS);
-            Request request = new Request.Builder().url(link).build();
+            Request request = new Request.Builder().url(url).build();
             Response response = client.newCall(request).execute();
             BufferedReader br = new BufferedReader(response.body().charStream(), 1000);
             String line = br.readLine();
@@ -94,11 +93,11 @@ public class ImageLoader extends ImageService.Loader {
                     line = br.readLine();
                 line = br.readLine();
                 line = line.substring(line.indexOf("src") + 5);
-                link = line.substring(0, line.indexOf("\""));
+                url = line.substring(0, line.indexOf("\""));
                 br.close();
             }
 
-            return new String[]{link, tags.toString(), carousel.toString()};
+            return new String[]{url, tags.toString(), carousel.toString()};
         } catch (Exception e) {
             e.printStackTrace();
             return null;
