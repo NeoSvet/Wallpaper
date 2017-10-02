@@ -80,6 +80,7 @@ public class ImageLoaderMotaRu extends ImageService.Loader {
                 carousel.delete(carousel.length() - 1, carousel.length());
             br.close();
 
+            String link = null;
             if (!onlyCarousel) {
                 response = client.newCall(request).execute();
                 br = new BufferedReader(response.body().charStream(), 1000);
@@ -87,10 +88,10 @@ public class ImageLoaderMotaRu extends ImageService.Loader {
                     line = br.readLine();
                 br.close();
                 line = line.substring(line.indexOf("src", line.indexOf("full-img")) + 5);
-                url = site + line.substring(0, line.indexOf("\""));
+                link = site + line.substring(0, line.indexOf("\""));
             }
 
-            return new String[]{url, tags.toString(), carousel.toString()};
+            return new String[]{url, link, tags.toString(), carousel.toString()};
         } catch (Exception e) {
             e.printStackTrace();
             return null;

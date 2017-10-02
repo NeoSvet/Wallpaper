@@ -86,6 +86,7 @@ public class ImageLoader extends ImageService.Loader {
             }
             br.close();
 
+            String link = null;
             if (!onlyCarousel) {
                 response = client.newCall(request).execute();
                 br = new BufferedReader(response.body().charStream(), 1000);
@@ -93,11 +94,11 @@ public class ImageLoader extends ImageService.Loader {
                     line = br.readLine();
                 line = br.readLine();
                 line = line.substring(line.indexOf("src") + 5);
-                url = line.substring(0, line.indexOf("\""));
+                link = line.substring(0, line.indexOf("\""));
                 br.close();
             }
 
-            return new String[]{url, tags.toString(), carousel.toString()};
+            return new String[]{url, link, tags.toString(), carousel.toString()};
         } catch (Exception e) {
             e.printStackTrace();
             return null;

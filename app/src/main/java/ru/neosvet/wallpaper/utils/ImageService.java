@@ -21,7 +21,7 @@ public class ImageService extends IntentService implements LoaderMaster.IService
 
     }
 
-    private final int LINK = 0, TAGS = 1, CAROUSEL = 2;
+    private final int URL = 0, LINK = 1, TAGS = 2, CAROUSEL = 3;
     private final IBinder binder = new LoaderMaster.MyBinder(ImageService.this);
     private Loader loader;
     private ImageActivity act;
@@ -75,9 +75,9 @@ public class ImageService extends IntentService implements LoaderMaster.IService
                         t = (act.getResources().getString(R.string.tags)
                                 + ":@" + result[TAGS]).split("@");
                         c = result[CAROUSEL].split("@");
-                        act.onPost(true, result[LINK], t, c);
+                        act.onPost(true, result[URL], result[LINK], t, c);
                     } else
-                        act.onPost(false, null, t, c);
+                        act.onPost(false, null, null, t, c);
                 }
             });
         }
