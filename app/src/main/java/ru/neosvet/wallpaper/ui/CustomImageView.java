@@ -1,7 +1,6 @@
 package ru.neosvet.wallpaper.ui;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -72,10 +71,16 @@ public class CustomImageView extends LinearLayout {
             simple_view.setImageResource(resource);
     }
 
-    public void setImage(Bitmap bitmap, String path) {
-        if (zooming_view != null)
-            zooming_view.setImage(ImageSource.bitmap(bitmap));
-        else
-            simple_view.setImageURI(android.net.Uri.parse(path));
+    public boolean setImage(String path) {
+        try {
+            if (zooming_view != null)
+                zooming_view.setImage(ImageSource.uri(path));
+            else
+                simple_view.setImageURI(android.net.Uri.parse(path));
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
