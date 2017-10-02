@@ -49,6 +49,7 @@ public class UniAdapter extends RecyclerView.Adapter<UniAdapter.ViewHolder> {
     }
 
     private boolean isImage() {
+        if (data == null) return false;
         return data[0].contains("jpg");
     }
 
