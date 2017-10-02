@@ -117,6 +117,7 @@ public class GalleryService extends IntentService implements LoaderMaster.IServi
                 try {
                     String mini;
                     while (urls.size() > 0 && status != ERROR) {
+                        if (urls.get(0) == null) return;
                         mini = getMini(urls.get(0));
                         while (status == SAVING) {
                             Thread.sleep(200);
