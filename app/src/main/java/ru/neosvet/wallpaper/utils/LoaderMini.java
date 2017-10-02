@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -30,7 +31,7 @@ public class LoaderMini implements Target {
         file = new File(context.getFilesDir() + FOLDER + url.substring(url.lastIndexOf("/")));
         if (!file.exists()) {
             Picasso.with(context)
-                    .load(url)
+                    .load(url).memoryPolicy(MemoryPolicy.NO_CACHE)
                     .into(this);
         } else {
             imageView.setImageDrawable(Drawable.createFromPath(file.toString()));
