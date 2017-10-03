@@ -15,7 +15,7 @@ public class Lib {
             PAGE = "page", TAG = "tag", MODE = "mode", NAME_REP = "name_rep";
 
     public static void log(String msg) {
-        Log.d("wallpaper", msg);
+        Log.d("neotest", msg);
     }
 
     public static String getFolder() {
