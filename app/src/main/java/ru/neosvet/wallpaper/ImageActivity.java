@@ -1,9 +1,6 @@
 package ru.neosvet.wallpaper;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -19,14 +16,9 @@ import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.LinkedList;
@@ -45,7 +37,7 @@ import ru.neosvet.wallpaper.utils.Lib;
 import ru.neosvet.wallpaper.utils.LoaderMaster;
 import ru.neosvet.wallpaper.utils.Settings;
 
-public class ImageActivity extends LoaderMaster implements Target, UniAdapter.OnItemClickListener {
+public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClickListener {
     private final String MENU = "menu", URL_CAR = "url_car", HISTORY = "/his";
     private CustomImageView imageView;
     private GalleryRepository repository, fav, recent;
@@ -70,6 +62,7 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Lib.log("onCreate: " + hashCode());
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -89,24 +82,15 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
     protected void restoreActivityState(Bundle state) {
         super.restoreActivityState(state);
         if (state == null) {
+            imageView.setImage(R.drawable.load_image);
             repository = new GalleryRepository(ImageActivity.this, getIntent().getStringExtra(DBHelper.LIST));
             loadImage(getIntent().getStringExtra(DBHelper.URL), null);
         } else {
-            try {
-                File f = new File(getFilesDir() + HISTORY);
-                BufferedReader br = new BufferedReader(new FileReader(f));
-                String s;
-                while ((s = br.readLine()) != null) {
-                    history.add(new HistoryItem(s, br.readLine()));
-                }
-                br.close();
-                f.delete();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            url = state.getString(DBHelper.URL);
-            url_car = state.getString(URL_CAR);
             repository = new GalleryRepository(ImageActivity.this, state.getString(Lib.NAME_REP));
+            url_car = state.getString(URL_CAR);
+            url = state.getString(DBHelper.URL);
+            if (url == null) return;
+            loadHistory();
             tags = state.getStringArray(Lib.TAG);
             if (state.getBoolean(MENU))
                 defaultMenu();
@@ -117,25 +101,28 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
             }
             adCarousel = new UniAdapter(ImageActivity.this, state.getStringArray(DBHelper.CARAROUSEL));
             rvCarousel.setAdapter(adCarousel);
-            file = Lib.getFile(url);
-            if (file.exists()) {
-                openImage();
-                TimerTask tTask = new TimerTask() {
-                    @Override
-                    public void run() {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                def_scale = imageView.getScale();
-                            }
-                        });
-                    }
-                };
-                Timer t = new Timer();
-                t.schedule(tTask, 100);
-            } else
-                imageView.setImage(R.drawable.no_image);
+            openImage(url);
         }
+    }
+
+    private void loadHistory() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    File f = new File(getFilesDir() + HISTORY);
+                    BufferedReader br = new BufferedReader(new FileReader(f));
+                    String s;
+                    while ((s = br.readLine()) != null) {
+                        history.add(new HistoryItem(s, br.readLine()));
+                    }
+                    br.close();
+                    f.delete();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -173,10 +160,9 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
 
     private void loadImage(String url, @Nullable String carousel) {
         progressBar.setVisibility(View.VISIBLE);
+        load = true;
         if (!url.contains(":"))
             url = settings.getSite() + url;
-        this.url = url;
-        file = Lib.getFile(url);
         intSrv.putExtra(DBHelper.URL, url);
         if (carousel == null)
             intSrv.removeExtra(DBHelper.CARAROUSEL);
@@ -185,17 +171,21 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
         startLoader();
     }
 
-    private void openImage() {
-        String path = file.toString();
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = BitmapFactory.decodeFile(path, options);
-        if (bitmap != null) {
-            addRecent(url);
-            imageView.setImage(bitmap, path);
-            def_scale = imageView.getScale();
-        } else
+    private boolean openImage(@Nullable String url) {
+        def_scale = 0f;
+        if (url != null) {
+            this.url = url;
+            file = Lib.getFile(url);
+        }
+        if (file.exists()) {
+            if (imageView.setImage(file.toString())) {
+                addRecent(url);
+                return true;
+            }
+        }
+        if (!load)
             imageView.setImage(R.drawable.no_image);
+        return false;
     }
 
     private void addRecent(final String url) {
@@ -276,6 +266,8 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
                     stopSlideShow();
                     return imageView.isSimpleView();
                 }
+                if (def_scale == 0f)
+                    def_scale = imageView.getScale();
                 if (motionEvent.getPointerCount() > 1 || load || imageView.getScale() != def_scale) {
                     return imageView.isSimpleView();
                 }
@@ -366,35 +358,12 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
     }
 
     @Override
-    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-        try {
-            FileOutputStream out = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
-            out.close();
-            openImage();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (!boolSlideShow)
-            progressBar.setVisibility(View.GONE);
-        load = false;
-    }
-
-    @Override
-    public void onBitmapFailed(Drawable errorDrawable) {
-        load = false;
-    }
-
-    @Override
-    public void onPrepareLoad(Drawable placeHolderDrawable) {
-        load = true;
-    }
-
-    @Override
     public void onConnect(IService srv) {
-        super.onConnect(srv);
+        Lib.log("onConnect");
         progressBar.setVisibility(View.VISIBLE);
+        load = true;
         srv.setAct(ImageActivity.this);
+        super.onConnect(srv);
     }
 
     public void onPost(String[] carousel) {
@@ -405,23 +374,20 @@ public class ImageActivity extends LoaderMaster implements Target, UniAdapter.On
         repository.save(true);
     }
 
-    public void onPost(boolean suc, @Nullable String link, String[] tags, final String[] carousel) {
+    public void onPost(boolean suc, @Nullable String url, @Nullable String link, String[] tags, final String[] carousel) {
+        Lib.log("onPost: " + hashCode() + ", "+url);
         this.tags = tags;
         if (suc) {
-            if (file.exists()) {
-                openImage();
+            if (openImage(url)) {
                 if (!boolSlideShow)
                     progressBar.setVisibility(View.GONE);
-            } else {
-                Picasso.with(ImageActivity.this)
-                        .load(link).memoryPolicy(MemoryPolicy.NO_CACHE)
-                        .placeholder(R.drawable.load_image)
-                        .error(R.drawable.no_image)
-                        .into(ImageActivity.this);
+                load = false;
             }
             defaultMenu();
             adCarousel = new UniAdapter(ImageActivity.this, carousel);
             rvCarousel.setAdapter(adCarousel);
+        } else {
+            imageView.setImage(R.drawable.no_image);
         }
     }
 
