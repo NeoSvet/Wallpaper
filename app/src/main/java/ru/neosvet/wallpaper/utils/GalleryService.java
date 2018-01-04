@@ -80,16 +80,28 @@ public class GalleryService extends IntentService implements LoaderMaster.IServi
         else
             loader = new GalleryLoader(GalleryService.this, site);
         final boolean suc = loader.download(intent.getIntExtra(Lib.PAGE, 1), intent.getStringExtra(Lib.TAG));
+        waitForAct();
         if (act != null) {
             act.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     act.onPost(suc, loader.getCount());
+                    act.finishLoader();
                 }
             });
         }
         if (!boolThread)
             stopSelf();
+    }
+
+    private void waitForAct() {
+        try {
+            while (act == null) {
+                Lib.log("wait");
+                Thread.sleep(100);
+            }
+        } catch (Exception e) {
+        }
     }
 
     private String getMini(String url) {
@@ -135,11 +147,13 @@ public class GalleryService extends IntentService implements LoaderMaster.IServi
                 }
                 boolThread = false;
                 if (status == FINISH) {
+                    waitForAct();
                     if (act != null) {
                         act.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 act.onPost(true, FINISH_MINI);
+                                act.finishLoader();
                                 stopSelf();
                             }
                         });
