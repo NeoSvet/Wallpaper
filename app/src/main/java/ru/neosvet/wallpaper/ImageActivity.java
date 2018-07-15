@@ -279,6 +279,10 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
                 if (def_scale == 0f)
                     def_scale = imageView.getScale();
                 if (motionEvent.getPointerCount() > 1 || load || imageView.getScale() != def_scale) {
+                    if (motionEvent.getPointerCount() > 1 && toolbar.getVisibility() == View.VISIBLE) {
+                        toolbar.setVisibility(View.GONE);
+                        rvCarousel.setVisibility(View.GONE);
+                    }
                     return imageView.isSimpleView();
                 }
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
