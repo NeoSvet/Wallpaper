@@ -227,8 +227,11 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                if (!changeImage(false))
+                String url = changeImage(false);
+                if (url == null)
                     showToast(getResources().getString(R.string.list_finish));
+                else
+                    loadImage(url, null);
             }
 
             @Override
@@ -245,8 +248,11 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                if (!changeImage(true))
+                String url = changeImage(true);
+                if (url == null)
                     showToast(getResources().getString(R.string.list_finish));
+                else
+                    loadImage(url, null);
             }
 
             @Override
@@ -302,7 +308,7 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
         });
     }
 
-    private boolean changeImage(boolean next) {
+    private String changeImage(boolean next) {
         String url_prev = null, u;
         if (repository.getCount() == 0)
             repository.load(getIntent().getBooleanExtra(Lib.SORT, false));
@@ -313,19 +319,17 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
                     i++;
                     if (i < repository.getCount()) {
 //                        addHistory();
-                        loadImage(repository.getUrl(i), null);
-                        return true;
+                        return repository.getUrl(i);
                     }
                     break;
                 } else if (url_prev != null) {
 //                    addHistory();
-                    loadImage(url_prev, null);
-                    return true;
+                    return url_prev;
                 } else break;
             }
             url_prev = u;
         }
-        return false;
+        return null;
     }
 
     @Override
@@ -370,24 +374,29 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
     }
 
     public void onPost(boolean suc, @Nullable String url, @Nullable String link, String[] tags, final String[] carousel) {
-        this.tags = tags;
         load = false;
-        progressBar.setVisibility(View.GONE);
+        if (!boolSlideShow)
+            progressBar.setVisibility(View.GONE);
         if (suc) {
-            if (openImage(url)) {
-                if (boolSlideShow)
-                    progressBar.setVisibility(View.VISIBLE);
+            if (!openImage(url)) {
+                loadImage(changeImage(true), null);
+                return;
             }
             adCarousel = new UniAdapter(ImageActivity.this, carousel);
             rvCarousel.setAdapter(adCarousel);
         } else {
             this.url = url;
+            if (boolSlideShow) {
+                loadImage(changeImage(true), null);
+                return;
+            }
             imageView.setImage(R.drawable.no_image);
             if (adCarousel != null) {
                 adCarousel.clear();
                 adCarousel.notifyDataSetChanged();
             }
         }
+        this.tags = tags;
         defaultMenu();
     }
 
@@ -463,9 +472,11 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
                     public void run() {
                         slideshow_time--;
                         if (slideshow_time == 0) {
-                            if (!changeImage(true))
+                            String url = changeImage(true);
+                            if (url == null)
                                 stopSlideShow();
                             else {
+                                loadImage(url, null);
                                 progressBar.setProgress(0);
                                 slideshow_time = settings.getSlideshowTime();
                             }

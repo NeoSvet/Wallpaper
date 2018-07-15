@@ -127,6 +127,7 @@ public class ImageService extends IntentService implements Target, LoaderMaster.
             bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
             out.close();
             openImage();
+            act.finishLoader();
         } catch (Exception e) {
             e.printStackTrace();
         }
