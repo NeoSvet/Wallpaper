@@ -93,8 +93,8 @@ public class ImageLoaderMotaRu extends ImageService.Loader {
 
             return new String[]{url, link, tags.toString(), carousel.toString()};
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+//            e.printStackTrace();
+            return new String[]{url, null, null, null};
         }
     }
 }
