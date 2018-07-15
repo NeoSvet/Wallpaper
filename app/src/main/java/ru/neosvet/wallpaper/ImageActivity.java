@@ -52,7 +52,7 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
     private Animation anPrev, anNext;
     private String[] tags;
     private boolean menu = true, move = false, load = false, anim = false;
-    private float dpi, def_scale, x;
+    private float dpi, x;
     private Timer tSlideShow;
     private List<HistoryItem> history = new LinkedList<HistoryItem>();
     private boolean boolSlideShow;
@@ -62,7 +62,6 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Lib.LOG("onCreate: " + hashCode());
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -172,7 +171,6 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
     }
 
     private boolean openImage(@Nullable String url) {
-        def_scale = 0f;
         if (url != null) {
             this.url = url;
             file = Lib.getFile(url);
@@ -266,9 +264,7 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
                     stopSlideShow();
                     return imageView.isSimpleView();
                 }
-                if (def_scale == 0f)
-                    def_scale = imageView.getScale();
-                if (motionEvent.getPointerCount() > 1 || load || imageView.getScale() != def_scale) {
+                if (motionEvent.getPointerCount() > 1 || load) {
                     return imageView.isSimpleView();
                 }
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
@@ -359,7 +355,6 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
 
     @Override
     public void onConnect(IService srv) {
-        Lib.LOG("onConnect");
         progressBar.setVisibility(View.VISIBLE);
         load = true;
         srv.setAct(ImageActivity.this);
@@ -375,20 +370,25 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
     }
 
     public void onPost(boolean suc, @Nullable String url, @Nullable String link, String[] tags, final String[] carousel) {
-        Lib.LOG("onPost: " + hashCode() + ", "+url);
         this.tags = tags;
+        load = false;
+        progressBar.setVisibility(View.GONE);
         if (suc) {
             if (openImage(url)) {
-                if (!boolSlideShow)
-                    progressBar.setVisibility(View.GONE);
-                load = false;
+                if (boolSlideShow)
+                    progressBar.setVisibility(View.VISIBLE);
             }
-            defaultMenu();
             adCarousel = new UniAdapter(ImageActivity.this, carousel);
             rvCarousel.setAdapter(adCarousel);
         } else {
+            this.url = url;
             imageView.setImage(R.drawable.no_image);
+            if (adCarousel != null) {
+                adCarousel.clear();
+                adCarousel.notifyDataSetChanged();
+            }
         }
+        defaultMenu();
     }
 
     private void defaultMenu() {

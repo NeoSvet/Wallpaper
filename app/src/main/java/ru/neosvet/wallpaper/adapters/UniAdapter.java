@@ -48,6 +48,10 @@ public class UniAdapter extends RecyclerView.Adapter<UniAdapter.ViewHolder> {
         return data;
     }
 
+    public void clear() {
+        data = null;
+    }
+
     private boolean isImage() {
         if (data == null) return false;
         return data[0].contains("jpg");
@@ -93,7 +97,7 @@ public class UniAdapter extends RecyclerView.Adapter<UniAdapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return data.length;
+        return (data == null ? 0 : data.length);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

@@ -37,8 +37,13 @@ public class ImageLoader extends ImageService.Loader {
             BufferedReader br = new BufferedReader(response.body().charStream(), 1000);
             String line = br.readLine();
             if (!onlyCarousel) {
-                while (!line.contains("/large"))
+                while (!line.contains("/large")) {
                     line = br.readLine();
+                    if(line.contains("Page not found")) {
+                        br.close();
+                        throw new Exception("Page not found");
+                    }
+                }
                 //img = line.substring(line.indexOf("src") + 5);
                 //img = img.substring(0, img.indexOf("\"")).replace("large", "mini");
                 line = br.readLine();
@@ -100,8 +105,8 @@ public class ImageLoader extends ImageService.Loader {
 
             return new String[]{url, link, tags.toString(), carousel.toString()};
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+//            e.printStackTrace();
+            return new String[]{url, null, null, null};
         }
     }
 }
