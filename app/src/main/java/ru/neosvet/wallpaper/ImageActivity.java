@@ -394,8 +394,13 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
                 loadImage(changeImage(true), null);
                 return;
             }
-            adCarousel = new UniAdapter(ImageActivity.this, carousel);
-            rvCarousel.setAdapter(adCarousel);
+            if (carousel.length > 0) {
+                adCarousel = new UniAdapter(ImageActivity.this, carousel);
+                rvCarousel.setAdapter(adCarousel);
+            } else if (adCarousel != null) {
+                adCarousel.clear();
+                adCarousel.notifyDataSetChanged();
+            }
         } else {
             this.url = url;
             if (boolSlideShow) {

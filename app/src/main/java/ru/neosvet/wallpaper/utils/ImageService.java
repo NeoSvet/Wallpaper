@@ -89,13 +89,17 @@ public class ImageService extends IntentService implements Target, LoaderMaster.
             act.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (result != null && result[LINK] != null) {
+                    if (result != null) {
                         File file = Lib.getFile(result[URL]);
-                        if (!file.exists()) {
-                            downloadImage();
-                            return;
+                        if (file.exists()) {
+                            openImage();
+                        } else {
+                            if (result[LINK] != null) {
+                                downloadImage();
+                                return;
+                            } else
+                                act.onPost(false, url, null, new String[]{}, new String[]{});
                         }
-                        openImage();
                     } else
                         act.onPost(false, url, null, new String[]{}, new String[]{});
                     act.finishLoader();
