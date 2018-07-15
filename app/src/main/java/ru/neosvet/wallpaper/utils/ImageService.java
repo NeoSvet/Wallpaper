@@ -75,7 +75,7 @@ public class ImageService extends IntentService implements Target, LoaderMaster.
     private void waitForAct() {
         try {
             while (act == null) {
-                Lib.log("wait");
+                Lib.LOG("wait");
                 Thread.sleep(100);
             }
         } catch (Exception e) {
@@ -83,14 +83,14 @@ public class ImageService extends IntentService implements Target, LoaderMaster.
     }
 
     private void download(String url) {
-        Lib.log("start download: " + url);
+        Lib.LOG("start download: " + url);
         result = loader.load(url, false);
         waitForAct();
         if (act != null) {
             act.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Lib.log("act: " + act.hashCode());
+                    Lib.LOG("act: " + act.hashCode());
                     if (result != null) {
                         File file = Lib.getFile(result[URL]);
                         if (!file.exists()) {

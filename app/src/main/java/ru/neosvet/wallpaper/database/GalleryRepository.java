@@ -44,7 +44,7 @@ public class GalleryRepository {
             do {
                 data.add(new GalleryItem(cursor.getString(iUrl),
                         cursor.getString(iMini)));
-//                Lib.log("mini: "+cursor.getString(iMini));
+//                Lib.LOG("mini: "+cursor.getString(iMini));
             } while (cursor.moveToNext());
         }
         dataBase.close();

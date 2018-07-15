@@ -14,7 +14,7 @@ public class Lib {
     public static final String FOLDER = "/wallpaper", MOTARU = "mota.ru", SORT = "sort", CATEGORIES = "cat",
             PAGE = "page", TAG = "tag", MODE = "mode", NAME_REP = "name_rep";
 
-    public static void log(String msg) {
+    public static void LOG(String msg) {
         Log.d("neotest", msg);
     }
 

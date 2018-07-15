@@ -62,7 +62,7 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Lib.log("onCreate: " + hashCode());
+        Lib.LOG("onCreate: " + hashCode());
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -359,7 +359,7 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
 
     @Override
     public void onConnect(IService srv) {
-        Lib.log("onConnect");
+        Lib.LOG("onConnect");
         progressBar.setVisibility(View.VISIBLE);
         load = true;
         srv.setAct(ImageActivity.this);
@@ -375,7 +375,7 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
     }
 
     public void onPost(boolean suc, @Nullable String url, @Nullable String link, String[] tags, final String[] carousel) {
-        Lib.log("onPost: " + hashCode() + ", "+url);
+        Lib.LOG("onPost: " + hashCode() + ", "+url);
         this.tags = tags;
         if (suc) {
             if (openImage(url)) {
