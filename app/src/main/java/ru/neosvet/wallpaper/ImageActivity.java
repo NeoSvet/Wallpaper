@@ -52,7 +52,7 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
     private Animation anPrev, anNext;
     private String[] tags;
     private boolean menu = true, move = false, load = false, anim = false;
-    private float dpi, x;
+    private float dpi, def_scale, x;
     private Timer tSlideShow;
     private List<HistoryItem> history = new LinkedList<HistoryItem>();
     private boolean boolSlideShow;
@@ -177,13 +177,19 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
         }
         if (file.exists()) {
             if (imageView.setImage(file.toString())) {
+                def_scale = 0f;
                 addRecent(url);
                 return true;
             }
         }
         if (!load)
-            imageView.setImage(R.drawable.no_image);
+            setErrorImage();
         return false;
+    }
+
+    private void setErrorImage() {
+        imageView.setImage(R.drawable.no_image);
+        def_scale = 0f;
     }
 
     private void addRecent(final String url) {
@@ -270,7 +276,9 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
                     stopSlideShow();
                     return imageView.isSimpleView();
                 }
-                if (motionEvent.getPointerCount() > 1 || load) {
+                if (def_scale == 0f)
+                    def_scale = imageView.getScale();
+                if (motionEvent.getPointerCount() > 1 || load || imageView.getScale() != def_scale) {
                     return imageView.isSimpleView();
                 }
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
@@ -390,7 +398,7 @@ public class ImageActivity extends LoaderMaster implements UniAdapter.OnItemClic
                 loadImage(changeImage(true), null);
                 return;
             }
-            imageView.setImage(R.drawable.no_image);
+            setErrorImage();
             if (adCarousel != null) {
                 adCarousel.clear();
                 adCarousel.notifyDataSetChanged();
