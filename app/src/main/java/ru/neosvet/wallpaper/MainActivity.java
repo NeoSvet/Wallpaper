@@ -100,6 +100,7 @@ public class MainActivity extends LoaderMaster
                         changeRep(DBHelper.RECENT);
                         break;
                     case R.id.nav_settings:
+                        finish();
                         startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                         break;
                     case R.id.nav_refresh:

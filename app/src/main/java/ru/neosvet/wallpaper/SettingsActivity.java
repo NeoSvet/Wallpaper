@@ -1,6 +1,7 @@
 package ru.neosvet.wallpaper;
 
 import android.app.Service;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
@@ -49,6 +50,12 @@ public class SettingsActivity extends AppCompatActivity {
         initSlideshowTimer();
         initStartOpen();
         initClearRecent();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(SettingsActivity.this, MainActivity.class));
     }
 
     @Override
