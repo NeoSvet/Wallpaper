@@ -105,11 +105,21 @@ public class ImageService extends IntentService implements Target, LoaderMaster.
     }
 
     private void openImage() {
-        String[] t, c;
+        String[] t;
         t = (act.getResources().getString(R.string.tags)
                 + ":@" + result[TAGS]).split("@");
-        c = result[CAROUSEL].split("@");
-        act.onPost(true, result[URL], result[LINK], t, c);
+        act.onPost(true, result[URL], result[LINK], t, getCarousel());
+    }
+
+    private String[] getCarousel() {
+        if (result == null || result[CAROUSEL] == null)
+            return new String[]{};
+        String[] c = result[CAROUSEL].split("@");
+        String url = result[URL];
+        url = url.substring(0, url.indexOf("/", url.indexOf(".")));
+        for (int i = 0; i < c.length; i++)
+            c[i] = url + c[i];
+        return c;
     }
 
     private void downloadImage() {
@@ -152,10 +162,7 @@ public class ImageService extends IntentService implements Target, LoaderMaster.
             act.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    String[] c = new String[]{};
-                    if (result != null)
-                        c = result[CAROUSEL].split("@");
-                    act.onPost(c);
+                    act.onPost(getCarousel());
                 }
             });
             download(url);

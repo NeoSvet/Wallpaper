@@ -92,7 +92,7 @@ public class UniAdapter extends RecyclerView.Adapter<UniAdapter.ViewHolder> {
     }
 
     public String getUrl(int index) {
-        return data[index].substring(0, data[index].indexOf("http"));
+        return data[index].substring(0, data[index].lastIndexOf("http"));
     }
 
     @Override
