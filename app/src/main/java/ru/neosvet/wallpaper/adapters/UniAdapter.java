@@ -71,7 +71,7 @@ public class UniAdapter extends RecyclerView.Adapter<UniAdapter.ViewHolder> {
     public void onBindViewHolder(UniAdapter.ViewHolder holder, final int position) {
         if (isImage()) {
             loaders.add(new LoaderMini(context,
-                    data[position].substring(data[position].indexOf("http")),
+                    data[position].substring(data[position].lastIndexOf("http")),
                     (ImageView) holder.item));
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
