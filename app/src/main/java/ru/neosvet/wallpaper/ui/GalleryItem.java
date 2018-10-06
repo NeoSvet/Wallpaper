@@ -21,6 +21,7 @@ public class GalleryItem {
     }
 
     public String getMini() {
+        if (mini == null) return "";
         return mini;
     }
 
