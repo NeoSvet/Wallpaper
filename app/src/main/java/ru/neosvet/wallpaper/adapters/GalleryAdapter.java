@@ -150,14 +150,17 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
             for (int i = n; i != e; i += s) {
                 bw.write(repository.getUrl(i));
+                Lib.LOG(repository.getUrl(i));
                 bw.newLine();
                 bw.write(repository.getMini(i));
+                Lib.LOG(repository.getMini(i));
                 bw.newLine();
                 bw.flush();
             }
             bw.close();
             return true;
         } catch (Exception e) {
+            Lib.LOG(e.getMessage());
             e.printStackTrace();
         }
         return false;
