@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/AndroidStudioProjects-Wallpaper.iml" filepath="$PROJECT_DIR$/AndroidStudioProjects-Wallpaper.iml" group="Wallpaper" />
       <module fileurl="file://$PROJECT_DIR$/Wallpaper.iml" filepath="$PROJECT_DIR$/Wallpaper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/Wallpaper-app.iml" filepath="$PROJECT_DIR$/app/Wallpaper-app.iml" group="Wallpaper/app" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
