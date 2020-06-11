@@ -61,7 +61,9 @@ public class GalleryLoaderMotaRu extends GalleryService.Loader {
 //            InputStream in = new BufferedInputStream(response.body().byteStream());
 //            BufferedReader br = new BufferedReader(new InputStreamReader(in, Lib.ENCODING), 1000);
             BufferedReader br = new BufferedReader(response.body().charStream(), 1000);
-            line = br.readLine();
+            line = "";
+            while(!line.contains("root-menu__flex"))
+                line = br.readLine();
             //categories:
             int u, i = line.indexOf("root-menu__flex");
             i = line.indexOf("href", i) + 6;
@@ -92,9 +94,10 @@ public class GalleryLoaderMotaRu extends GalleryService.Loader {
             }
             //gallery:
             GalleryRepository repository = new GalleryRepository(context, DBHelper.LIST);
-            while (!line.contains("element"))
+            while (!line.contains("parent-element"))
                 line = br.readLine();
-            i = line.indexOf("\"element");
+            i = line.indexOf("parent-element");
+            i = line.indexOf("element", i + 10);
             i = line.indexOf("href", i) + 6;
             int end = line.lastIndexOf("deskription");
             while (i < end && i > 5) {
@@ -112,7 +115,8 @@ public class GalleryLoaderMotaRu extends GalleryService.Loader {
                     if (line.contains("Yandex")) {
                         while (!line.contains("<li>"))
                             line = br.readLine();
-                    }
+                    } else
+                        line = br.readLine();
                     end = line.lastIndexOf("deskription");
                     i = line.indexOf("href", i) + 6;
                 }
