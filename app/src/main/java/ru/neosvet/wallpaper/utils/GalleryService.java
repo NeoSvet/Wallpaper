@@ -96,9 +96,11 @@ public class GalleryService extends IntentService implements LoaderMaster.IServi
 
     private void waitForAct() {
         try {
-            while (act == null) {
+            int i = 0;
+            while (act == null && i < 100) {
                 Lib.LOG("wait");
                 Thread.sleep(100);
+                i++;
             }
         } catch (Exception e) {
         }
