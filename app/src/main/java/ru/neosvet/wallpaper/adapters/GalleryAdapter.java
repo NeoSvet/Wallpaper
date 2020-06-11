@@ -151,7 +151,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
             for (int i = n; i != e; i += s) {
                 bw.write(repository.getUrl(i));
                 bw.newLine();
-                bw.write(repository.getMini(i));
+                if (repository.getMini(i) == null)
+                    bw.write("");
+                else
+                    bw.write(repository.getMini(i));
                 bw.newLine();
                 bw.flush();
             }
