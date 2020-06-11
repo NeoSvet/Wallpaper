@@ -19,7 +19,7 @@ import ru.neosvet.wallpaper.R;
  */
 
 public class LoaderMini implements Target {
-    private final String FOLDER = "/mini";
+    public static final String FOLDER = "/mini";
     private ImageView imageView;
     private File file;
     private boolean finish = false;

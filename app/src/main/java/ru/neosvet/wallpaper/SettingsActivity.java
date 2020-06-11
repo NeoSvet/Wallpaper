@@ -24,6 +24,7 @@ import java.util.List;
 import ru.neosvet.wallpaper.database.DBHelper;
 import ru.neosvet.wallpaper.database.GalleryRepository;
 import ru.neosvet.wallpaper.ui.Tip;
+import ru.neosvet.wallpaper.utils.LoaderMini;
 import ru.neosvet.wallpaper.utils.Settings;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -50,6 +51,7 @@ public class SettingsActivity extends AppCompatActivity {
         initSlideshowTimer();
         initStartOpen();
         initClearRecent();
+        initClearMini();
     }
 
     @Override
@@ -69,7 +71,7 @@ public class SettingsActivity extends AppCompatActivity {
         settings.save();
 
         for (int i = 0; i < etSite.getAdapter().getCount(); i++) {
-            if(site.equals(etSite.getAdapter().getItem(i)))
+            if (site.equals(etSite.getAdapter().getItem(i)))
                 return;
         }
 
@@ -178,6 +180,21 @@ public class SettingsActivity extends AppCompatActivity {
                 GalleryRepository recent = new GalleryRepository(SettingsActivity.this, DBHelper.RECENT);
                 recent.save(true);
                 tip.show();
+            }
+        });
+    }
+
+    private void initClearMini() {
+        findViewById(R.id.bClearMini).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    File dir = new File(getFilesDir() + LoaderMini.FOLDER);
+                    for (File file : dir.listFiles())
+                        file.delete();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

@@ -93,9 +93,21 @@
             android:id="@+id/bClearRecent"
             android:layout_width="@dimen/def_width"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/field"
             android:padding="10dp"
             android:text="@string/clear_recent"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/bClearMini"
+            android:layout_width="@dimen/def_width"
+            android:layout_height="wrap_content"
+            android:background="@drawable/field"
+            android:padding="10dp"
+            android:text="@string/clear_mini"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
             android:textSize="18sp" />

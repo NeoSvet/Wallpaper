@@ -24,6 +24,7 @@
     <string name="start_open">Открывать при запуске:</string>
     <string name="object_for_view">Компонент для отображения картинки:</string>
     <string name="clear_recent">Очистить список недавнего</string>
+    <string name="clear_mini">Очистить кэш миниатюр</string>
     <string name="clear_sites">Очистить список сайтов</string>
     <string name="list_finish">Список закончился</string>
     <string name="add_fav">Добавить в избранное</string>
